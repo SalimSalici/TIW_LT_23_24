@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+	<header th:fragment="header" class="top-menu">
+		<div class="wrapper">
+			<div class="top-menu-container">
+				<div>
+					<a th:href="${session.user != null} ? @{/home} : @{/auth}" href="#"> <span class="material-symbols-outlined" style="font-size: 28px;">hub</span>
+						<!-- <img src="logo-placeholder.png" alt="Logo" style="height: 30px;"> -->
+						<span style="position: relative; top: -6px; left: 10px">
+							<b>Work Groups</b>
+						</span>
+					</a>
+				</div>
+				<div th:if="${session.user != null}" class="right-menu">
+					<a href="#profile" class="nav-item">Profile</a>
+					<a th:href="@{/logout}" href="#" class="nav-item">Logout</a>
+				</div>
+			</div>
+		</div>
+	</header>
+
+</body>
+
+</html>

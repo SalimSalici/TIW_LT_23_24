@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Groups - Home</title>
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/style.css" th:href="@{/css/style.css}" />
+<link rel="stylesheet" type="text/css" media="all"
+	href="../css/authStyle.css" th:href="@{/css/homeStyle.css}" />
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+
+	<header th:replace="@{thfragments/header} :: header"></header>
+
+	<div class="wrapper">
+
+		<h1 style="margin-top: 40px">
+			Welcome <span th:if="${session.user != null}" th:text="${session.user.username}">[name]</span>
+		</h1>
+
+		<form action="redirect-page-url" method="POST">
+			<div class="form-row">
+				<div class="input-field group-name">
+					<label for="groupName">Group Name:</label> <input type="text"
+						id="groupName" name="groupName" required>
+				</div>
+
+				<div class="input-field">
+					<label for="duration">Duration (in days):</label> <input
+						type="number" id="duration" name="duration" min="1" required>
+				</div>
+
+				<div class="input-field">
+					<label for="minMembers">Minimum Members:</label> <input
+						type="number" id="minMembers" name="minMembers" min="2" required>
+				</div>
+
+				<div class="input-field">
+					<label for="maxMembers">Maximum Members:</label> <input
+						type="number" id="maxMembers" name="maxMembers" min="2" required>
+				</div>
+			</div>
+
+			<input type="submit" value="Create Group">
+		</form>
+
+		<br>
+		<h2>Your active Groups:</h2>
+		<ul>
+			<li>
+				<h3>Group 1</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 4 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 3/10
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 2</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 6 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 5/15
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 3</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 8 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 4/12
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 4</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 10 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 8/20
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 5</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 12 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 10/10
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 6</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 3 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 2/5
+				</p>
+				<button>View Details</button>
+			</li>
+		</ul>
+
+		<br>
+		<h2>Other active groups you are part of:</h2>
+		<ul>
+			<li>
+				<h3>Group 1</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 4 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 3/10
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 2</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 6 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 5/15
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 3</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 8 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 4/12
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 4</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 10 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 8/20
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 5</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 12 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 10/10
+				</p>
+				<button>View Details</button>
+			</li>
+			<li>
+				<h3>Group 6</h3>
+				<p>
+					<img src="time-left.png" alt="Duration"
+						style="height: 16px; width: 16px;"> Duration: 3 Days
+				</p>
+				<p>
+					<img src="group-chat.png" alt="Members"
+						style="height: 16px; width: 16px;"> Members: 2/5
+				</p>
+				<button>View Details</button>
+			</li>
+		</ul>
+	</div>
+
+</body>
+</html>
