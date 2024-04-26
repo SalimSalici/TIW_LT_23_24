@@ -57,14 +57,14 @@ public class RegisterCheck extends HttpServlet {
 		
 		// Basic input validation (length of inputs, valid email, passwords match...)
 		RegisterFormValidation validation = this.validateInputs(username, name, surname, email, password, confirmPassword);
-		
-		UserDAO uDAO = new UserDAO(this.connection);
 
 		if (validation.hasErrors()) {
 			request.getSession().setAttribute("registerValidation", validation);
 			response.sendRedirect(request.getContextPath() + "/auth");
 			return;
 		}
+		
+		UserDAO uDAO = new UserDAO(this.connection);
 		
 		try {
 			uDAO.register(username, email, password, name, surname);
@@ -83,11 +83,15 @@ public class RegisterCheck extends HttpServlet {
 		try {
 			user = uDAO.login(username, password);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database credential checking.");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
 		
-		System.out.println("Test set session: " + user.toString());
+		if (user == null) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
+			return;
+		}
+		
 		request.getSession().setAttribute("user", user);
 		response.sendRedirect(request.getContextPath() + "/home");
 	}

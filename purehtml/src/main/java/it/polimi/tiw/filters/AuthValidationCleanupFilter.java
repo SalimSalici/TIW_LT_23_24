@@ -48,7 +48,6 @@ public class AuthValidationCleanupFilter extends HttpFilter implements Filter {
 			HttpSession session = req.getSession(false); // Get the session if it exists, do not create if it doesn't
 			if (session != null) {
 				session.removeAttribute("loginErrorMessage");
-				session.removeAttribute("registerErrorMessage");
 				session.removeAttribute("registerValidation");
 			}
 		}
