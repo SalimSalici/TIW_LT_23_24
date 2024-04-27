@@ -17,7 +17,7 @@ public class GroupDAO {
 		this.connection = connection;
 	}
 	
-	public List<Group> getGroupsOwnedBy(int userId) throws SQLException {
+	public List<Group> fetchGroupsOwnedBy(int userId) throws SQLException {
 		List<Group> groups = new LinkedList<>();
 		// String query = "SELECT id, group_name, user_id, duration, min_users, max_users, created_at FROM `groups` WHERE user_id = ?";
 		String query = "SELECT id, group_name, `groups`.user_id, duration, min_users, max_users, created_at, COUNT(user_groups.group_id) AS user_count " +

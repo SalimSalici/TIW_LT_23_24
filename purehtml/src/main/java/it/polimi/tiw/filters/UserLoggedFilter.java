@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class UserLoggedFilter
  */
-@WebFilter({"/home", "/logout"})
+@WebFilter({"/home", "/creategroup", "/logout"})
 public class UserLoggedFilter extends HttpFilter implements Filter {
    
 	private static final long serialVersionUID = 1L;

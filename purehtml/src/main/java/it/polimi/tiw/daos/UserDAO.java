@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 import it.polimi.tiw.beans.User;
 
@@ -12,6 +14,27 @@ public class UserDAO {
 
 	public UserDAO(Connection connection) {
 		this.connection = connection;
+	}
+	
+	public List<User> fetchAllUsers() throws SQLException {
+		List<User> users = new LinkedList<>();
+		String query = "SELECT  id, username, email, name, surname FROM users";
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					users.add(
+						new User(
+							result.getInt("id"),
+							result.getString("username"),
+							result.getString("email"),
+							result.getString("name"),
+							result.getString("surname")
+						)
+					);
+				}
+			}
+		}
+		return users;
 	}
 
 	public User login(String username, String password) throws SQLException {

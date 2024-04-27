@@ -51,7 +51,7 @@ public class Home extends HttpServlet {
 		User user = (User)request.getSession().getAttribute("user");
 		List<Group> ownedGroups;
 		try {
-			ownedGroups = new GroupDAO(this.connection).getGroupsOwnedBy(user.getId());
+			ownedGroups = new GroupDAO(this.connection).fetchGroupsOwnedBy(user.getId());
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -63,8 +63,6 @@ public class Home extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("ownedGroups", ownedGroups);
-		
-		ownedGroups.forEach(System.out::println);
 		
 		templateEngine.process(path, ctx, response.getWriter());
 	}
