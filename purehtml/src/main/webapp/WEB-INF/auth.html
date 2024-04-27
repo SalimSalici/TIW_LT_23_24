@@ -18,7 +18,8 @@
 		<div>
 			<h2>Login Form</h2>
 			<form method="POST" th:action="@{/login}">
-				<div th:if="${session.loginErrorMessage != null}" class="error-box" th:text="${session.loginErrorMessage}">Error message</div>
+				<div th:if="${session.loginErrorMessage != null}" class="error-box"
+					th:text="${session.loginErrorMessage}">Error message</div>
 				<label for="loginUsername">Username:</label><br>
 				<input type="text" id="loginUsername" name="loginUsername" class="textInput"><br>
 				<label for="loginPassword">Password:</label><br>
@@ -39,54 +40,49 @@
 				<label for="registerUsername">Username:</label><br>
 				<input type="text" id="registerUsername" name="registerUsername" class="textInput"
 					th:value="${session.registerValidation != null && session.registerValidation.username != null ? session.registerValidation.username : '' }"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.usernameError != null}" 
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.usernameError != null}"
 					th:text="${session.registerValidation.usernameError}">
-						Error message
+					Error message
 				</div>
 				<label for="registerName">Name:</label><br>
 				<input type="text" id="registerName" name="registerName" class="textInput"
 					th:value="${session.registerValidation != null && session.registerValidation.name != null ? session.registerValidation.name : '' }"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.nameError != null}" 
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.nameError != null}"
 					th:text="${session.registerValidation.nameError}">
-						Error message
+					Error message
 				</div>
 				<label for="registerSurname">Surname:</label><br>
 				<input type="text" id="registerSurname" name="registerSurname" class="textInput"
 					th:value="${session.registerValidation != null && session.registerValidation.surname != null ? session.registerValidation.surname : '' }"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.surnameError != null}" 
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.surnameError != null}"
 					th:text="${session.registerValidation.surnameError}">
-						Error message
+					Error message
 				</div>
 				<label for="registerEmail">Email:</label><br>
 				<input type="email" id="registerEmail" name="registerEmail" class="textInput"
 					th:value="${session.registerValidation != null && session.registerValidation.email != null ? session.registerValidation.email : '' }"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.emailError != null}" 
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.emailError != null}"
 					th:text="${session.registerValidation.emailError}">
-						Error message
+					Error message
 				</div>
 				<label for="registerPassword">Password:</label><br>
 				<input type="password" id="registerPassword" name="registerPassword" class="textInput"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.passwordError != null}" 
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.passwordError != null}"
 					th:text="${session.registerValidation.passwordError}">
-						Error message
+					Error message
 				</div>
 				<label for="registerConfirmPassword">Confirm Password:</label><br>
-				<input type="password" id="registerConfirmPassword" name="registerConfirmPassword" class="textInput"><br>
-				<div
-					class="error-box"
-					th:if="${session.registerValidation != null && session.registerValidation.confirmPasswordError != null}" 
+				<input type="password" id="registerConfirmPassword" name="registerConfirmPassword"
+					class="textInput"><br>
+				<div class="error-box"
+					th:if="${session.registerValidation != null && session.registerValidation.confirmPasswordError != null}"
 					th:text="${session.registerValidation.confirmPasswordError}">
-						Error message
+					Error message
 				</div>
 				<input type="submit" value="Register">
 			</form>

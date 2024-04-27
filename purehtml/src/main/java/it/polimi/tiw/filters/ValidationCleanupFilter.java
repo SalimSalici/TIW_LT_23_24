@@ -15,15 +15,15 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class AuthValidationCleanupFilter
  */
-@WebFilter("/auth")
-public class AuthValidationCleanupFilter extends HttpFilter implements Filter {
+@WebFilter({"/auth", "/home"})
+public class ValidationCleanupFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpFilter#HttpFilter()
 	 */
-	public AuthValidationCleanupFilter() {
+	public ValidationCleanupFilter() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -49,6 +49,7 @@ public class AuthValidationCleanupFilter extends HttpFilter implements Filter {
 			if (session != null) {
 				session.removeAttribute("loginErrorMessage");
 				session.removeAttribute("registerValidation");
+				session.removeAttribute("createGroupValidation");
 			}
 		}
 	}
