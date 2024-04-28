@@ -21,7 +21,8 @@
 			Welcome <span th:if="${session.user != null}" th:text="${session.user.username}">[name]</span>
 		</h1>
 
-		<form th:action="@{/creategroup}" action="#" method="POST">
+		<form th:action="@{/inviteusers}" action="#" method="POST">
+			<input type="hidden" name="attempt" value="0">
 			<div class="error-box" th:if="${session.createGroupValidation != null}">
 				<ul th:remove="all-but-first">
 					<li th:each="errorMessage : ${session.createGroupValidation.errorMessages}" th:text="${errorMessage}">Error message 0</li>
