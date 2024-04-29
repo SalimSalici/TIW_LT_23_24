@@ -18,7 +18,7 @@ public class UserDAO {
 	
 	public List<User> fetchAllUsers() throws SQLException {
 		List<User> users = new LinkedList<>();
-		String query = "SELECT  id, username, email, name, surname FROM users";
+		String query = "SELECT  id, username, email, name, surname FROM users ORDER BY surname ASC";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			try (ResultSet result = pstatement.executeQuery();) {
 				while (result.next()) {

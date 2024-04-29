@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Work Groups - Cancellation</title>
+	<link rel="stylesheet" type="text/css" media="all" href="../css/style.css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+	<header th:replace="@{thfragments/header} :: header"></header>
+
+	<div class="wrapper">
+		<h1>Cancellation</h1>
+		<div class="error-box">
+			<p>
+				Third attempt creating a group with an incorrect number of participants.
+			</p>
+			<p>
+				The group will not be created.
+			</p>
+			<p>
+				Click <a th:href="@{/home}" href="#">here</a> to go back to the home page.
+			</p>
+		</div>
+	</div>
+</body>
+
+</html>

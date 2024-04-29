@@ -8,10 +8,6 @@
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-	/* width: 90%; */
-	margin-left: auto;
-	margin-right: auto;
-	user-select: none;
 	gap: 12px;
 }
 

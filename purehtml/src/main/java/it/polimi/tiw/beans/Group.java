@@ -10,19 +10,18 @@ public class Group {
 	private int duration;
 	private int minUsers;
 	private int maxUsers;
-	private Date created_at;
+	private Date createdAt;
 	private Date endDate;
 	private int userCount;
 	
-	public Group(int id, String groupName, int userId, int duration, int minUsers, int maxUsers, Date created_at, int userCount) {
+	public Group(int id, String groupName, int userId, int duration, int minUsers, int maxUsers, Date created_at) {
 		this.id = id;
 		this.groupName = groupName;
 		this.setUserId(userId);
 		this.duration = duration;
 		this.minUsers = minUsers;
 		this.maxUsers = maxUsers;
-		this.created_at = created_at;
-		this.userCount = userCount;
+		this.createdAt = created_at;
 
 		// Calculate end date which is 'duration' days after created_at
         Calendar cal = Calendar.getInstance();
@@ -71,12 +70,12 @@ public class Group {
 		this.maxUsers = maxUsers;
 	}
 
-	public Date getCreated_at() {
-		return created_at;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreated_at(Date created_at) {
-		this.created_at = created_at;
+	public void setCreatedAt(Date created_at) {
+		this.createdAt = created_at;
 	}
 
 	public Date getEndDate() {
@@ -98,7 +97,7 @@ public class Group {
 	@Override
 	public String toString() {
 		return "Group [id=" + id + ", groupName=" + groupName + ", userId=" + userId + ", duration=" + duration
-				+ ", minUsers=" + minUsers + ", maxUsers=" + maxUsers + ", created_at=" + created_at + ", endDate="
+				+ ", minUsers=" + minUsers + ", maxUsers=" + maxUsers + ", created_at=" + createdAt + ", endDate="
 				+ endDate + "]";
 	}
 

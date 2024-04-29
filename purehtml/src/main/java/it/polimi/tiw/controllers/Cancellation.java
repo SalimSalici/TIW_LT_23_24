@@ -1,56 +1,55 @@
 package it.polimi.tiw.controllers;
 
 import java.io.IOException;
-import java.sql.Connection;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import it.polimi.tiw.utils.DatabaseInitializer;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
+
+import it.polimi.tiw.utils.ThymeleafInitializer;
 
 /**
- * Servlet implementation class CreateGroup
+ * Servlet implementation class Cancellation
  */
-@WebServlet("/creategroup")
-public class CreateGroup extends HttpServlet {
+@WebServlet("/cancellation")
+public class Cancellation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Connection connection;
+	private TemplateEngine templateEngine;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateGroup() {
+    public Cancellation() {
         super();
         // TODO Auto-generated constructor stub
     }
     
-    public void init() throws UnavailableException {
-    	this.connection = DatabaseInitializer.initialize(this.getServletContext());
+    public void init() {
+    	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		String path = "cancellation";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String toPrint = "";
-		String[] users = request.getParameterValues("usersToInvite[]");
-		for (String u : users) {
-			toPrint += u + "; ";
-		}
-		response.getWriter().append(toPrint); 
-		
+		// TODO Auto-generated method stub
+		doGet(request, response);
 	}
 
 }

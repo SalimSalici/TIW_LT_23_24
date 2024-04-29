@@ -48,25 +48,25 @@ public class InviteUsers extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "GET method not allowed.");
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		int attempt = Integer.parseInt(request.getParameter("attempt"));
-		if (attempt > 3) {
-			// TODO: redirect to cancellation page 
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cancellation...");
-		}
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		
 		String groupName = request.getParameter("groupName");
-		int duration = Integer.parseInt(request.getParameter("duration"));
-		int minMembers = Integer.parseInt(request.getParameter("minMembers"));
-		int maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
+		if (groupName == null || groupName.equals("")) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Form was not sent correctly.");
+			return;
+		}
+		
+		int duration;
+		int minMembers;
+		int maxMembers;
+		try {
+			duration = Integer.parseInt(request.getParameter("duration"));
+			minMembers = Integer.parseInt(request.getParameter("minMembers"));
+			maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
+		} catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Form was not sent correctly.");
+			return;
+		}
 		
 		CreateGroupFormValidation validation = this.validateForm(groupName, duration, minMembers, maxMembers);
 		
@@ -98,9 +98,60 @@ public class InviteUsers extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("users", users);
-		ctx.setVariable("attempt", attempt + 1);
 
 		templateEngine.process(path, ctx, response.getWriter());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String groupName = request.getParameter("groupName");
+		int duration = Integer.parseInt(request.getParameter("duration"));
+		int minMembers = Integer.parseInt(request.getParameter("minMembers"));
+		int maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
+		String[] usersToInviteStrings = request.getParameterValues("usersToInvite[]");
+		int[] usersToInvite = new int[usersToInviteStrings.length];
+		for (int i = 0; i < usersToInvite.length; i++)
+			usersToInvite[i] = Integer.parseInt(usersToInviteStrings[i]);
+		
+		int inviteCount = usersToInvite.length;
+		
+		boolean error = false;
+		int shortage = minMembers - inviteCount;
+		int excess = inviteCount - maxMembers;
+		if (shortage > 0) {
+			error = true;
+			request.setAttribute("errorMessage", "Not enough users selected. Select at least " + shortage + " more.");
+		} else if (excess > 0) {
+			error = true;
+			request.setAttribute("errorMessage", "Too many users selected. Deselect at least " + excess + " user(s).");
+		}
+		
+		if (error) {
+			int attempt = Integer.parseInt(request.getParameter("attempt"));
+			if (attempt == 3) {
+				response.sendRedirect(request.getContextPath() + "/cancellation");
+				return;
+			}
+			request.setAttribute("prevInvitedUsers", usersToInvite);
+			request.setAttribute("attempt", attempt + 1);
+			this.doGet(request, response);
+			return;
+		}
+		
+		// Validation passed
+		User user = (User)request.getSession().getAttribute("user");
+		GroupDAO gDAO = new GroupDAO(this.connection);
+		try {
+			gDAO.createNewGroup(groupName, user.getId(), duration, minMembers, maxMembers, usersToInvite);
+		} catch (SQLException e) {
+//			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
+			return;
+		}
+		
+		response.sendRedirect(request.getContextPath() + "/home");
 	}
 	
 	private CreateGroupFormValidation validateForm(String groupName, int duration, int minMembers, int maxMembers) {

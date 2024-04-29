@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Work Groups - Group details</title>
+	<link rel="stylesheet" type="text/css" media="all" href="../css/style.css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet" type="text/css" media="all" href="../css/inviteUsersStyle.css"
+		th:href="@{/css/inviteUsersStyle.css}" />
+		<link rel="stylesheet" type="text/css" media="all" href="../css/groupStyle.css"
+		th:href="@{/css/groupStyle.css}" />
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+
+	<header th:replace="@{thfragments/header} :: header"></header>
+
+	<div class="wrapper">
+
+		<br>
+		<h1>Group details</h1>
+		<div class="container">
+			<div class="group-info-container">
+				<div class="group-info-item">
+					<h3>Group name</h3>
+					<p th:text="${group.groupName}">[Name of group]</p>
+				</div>
+				<div class="group-info-item">
+					<h3>Owner</h3>
+					<p th:text="${group.groupName}">[Name Surname Username]</p>
+				</div>
+				<div class="group-info-break"></div>
+				<div class="group-info-item">
+					<h3>Duration</h3>
+					<p><span th:text="${group.duration}">0</span> days</p>
+				</div>
+				<div class="group-info-item">
+					<h3>Creation date</h3>
+					<p th:text="${group.createdAt}">23/02/2024</p>
+				</div>
+				<div class="group-info-item">
+					<h3>End date</h3>
+					<p th:text="${group.endDate}">23/02/2024</p>
+				</div>
+				<div class="group-info-break"></div>
+				<div class="group-info-item">
+					<h3>Member count</h3>
+					<p th:text="${group.userCount}">0</p>
+				</div>
+				<div class="group-info-item">
+					<h3>Minimum members</h3>
+					<p th:text="${group.minUsers}">0</p>
+				</div>
+				<div class="group-info-item">
+					<h3>Maximum members</h3>
+					<p th:text="${group.maxUsers}">0</p>
+				</div>
+			</div>
+			<h3>Members</h3>
+			<div class="users-container" th:remove="all-but-first">
+				<div class="user-tile-container" th:each="groupUser : ${groupUsers}">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span th:text="${groupUser.username}">Username</span><br>
+							<span th:text="${groupUser.name} + ' ' + ${groupUser.surname}">Name Surname</span>
+						</span>
+					</span>
+				</div>
+				<div class="user-tile-container">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span>Username</span><br>
+							<span>Name Surname</span>
+						</span>
+					</span>
+				</div>
+				<div class="user-tile-container">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span>Username</span><br>
+							<span>Name Surname</span>
+						</span>
+					</span>
+				</div>
+				<div class="user-tile-container">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span>Username</span><br>
+							<span>Name Surname</span>
+						</span>
+					</span>
+				</div>
+				<div class="user-tile-container">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span>Username</span><br>
+							<span>Name Surname</span>
+						</span>
+					</span>
+				</div>
+				<div class="user-tile-container">
+					<span class="user-box-tile">
+						<span class="user-box-icon">
+							<span class="material-symbols-outlined"> account_circle </span>
+						</span>
+						<span class="user-box-label">
+							<span>Username</span><br>
+							<span>Name Surname</span>
+						</span>
+					</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+
+</html>
