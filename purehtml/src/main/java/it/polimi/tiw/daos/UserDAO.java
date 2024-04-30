@@ -1,12 +1,14 @@
 package it.polimi.tiw.daos;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
 
 public class UserDAO {
@@ -84,4 +86,71 @@ public class UserDAO {
 			pstatement.executeUpdate();
 		}
 	}
+	
+	public List<Group> fetchGroupsOwnedBy(int userId) throws SQLException {
+		List<Group> groups = new LinkedList<>();
+		String query = "SELECT id, group_name, `groups`.user_id, duration, min_users, max_users, created_at, COUNT(user_groups.group_id) AS user_count "
+				+ "FROM `groups` LEFT JOIN user_groups ON user_groups.group_id = `groups`.id "
+				+ "WHERE `groups`.user_id = ? "
+				+ "AND DATE_ADD(`groups`.created_at, INTERVAL `groups`.duration DAY) >= CURDATE()"
+				+ "GROUP BY id";
+
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setInt(1, userId);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					int id = result.getInt("id");
+					String group_name = result.getString("group_name");
+					int user_id = result.getInt("user_id");
+					int duration = result.getInt("duration");
+					int min_users = result.getInt("min_users");
+					int max_users = result.getInt("max_users");
+					Date created_at = result.getDate("created_at");
+					int user_count = result.getInt("user_count");
+					Group gr = new Group(id, group_name, user_id, duration, min_users, max_users, created_at);
+					gr.setUserCount(user_count);
+					groups.add(gr);
+				}
+			}
+		}
+		return groups;
+	}
+	
+	public List<Group> fetchGroupsWithUser(int userId) throws SQLException {
+		List<Group> groups = new LinkedList<>();
+		String query =
+				   "SELECT g.id, g.group_name, g.duration, g.min_users, g.max_users, g.created_at, u.user_count, ug.user_id "
+	             + "FROM `groups` g "
+	             + "JOIN ("
+	             		// This subquery is to extract the member count of each group
+	             + "    SELECT group_id, COUNT(user_id) AS user_count " 
+	             + "    FROM user_groups "
+	             + "    GROUP BY group_id"
+	             + ") u ON g.id = u.group_id "
+	             + "JOIN user_groups ug ON g.id = ug.group_id "
+	             + "WHERE ug.user_id = ? "
+	             + "AND DATE_ADD(g.created_at, INTERVAL g .duration DAY) >= CURDATE()";
+		
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setInt(1, userId);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					int id = result.getInt("id");
+					String group_name = result.getString("group_name");
+					int user_id = result.getInt("user_id");
+					int duration = result.getInt("duration");
+					int min_users = result.getInt("min_users");
+					int max_users = result.getInt("max_users");
+					Date created_at = result.getDate("created_at");
+					int user_count = result.getInt("user_count");
+					Group gr = new Group(id, group_name, user_id, duration, min_users, max_users, created_at);
+					gr.setUserCount(user_count);
+					groups.add(gr);
+				}
+			}
+		}
+		return groups;
+	}
+	
+	
 }

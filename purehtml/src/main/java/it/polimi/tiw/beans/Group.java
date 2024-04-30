@@ -7,6 +7,7 @@ public class Group {
 	private int id;
 	private String groupName;
 	private int userId;
+	private User owner;
 	private int duration;
 	private int minUsers;
 	private int maxUsers;
@@ -107,5 +108,13 @@ public class Group {
 
 	public void setUserCount(int userCount) {
 		this.userCount = userCount;
+	}
+
+	public User getOwner() {
+		return owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 }

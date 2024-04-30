@@ -1,4 +1,4 @@
-package it.polimi.tiw.beans;
+package it.polimi.tiw.formbeans;
 
 public class RegisterFormValidation {
 	private String username;

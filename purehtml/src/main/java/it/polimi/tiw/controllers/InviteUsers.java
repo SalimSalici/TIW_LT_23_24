@@ -16,10 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
-import it.polimi.tiw.beans.CreateGroupFormValidation;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.daos.GroupDAO;
 import it.polimi.tiw.daos.UserDAO;
+import it.polimi.tiw.formbeans.CreateGroupFormValidation;
 import it.polimi.tiw.utils.DatabaseInitializer;
 import it.polimi.tiw.utils.ThymeleafInitializer;
 
@@ -31,48 +31,35 @@ public class InviteUsers extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public InviteUsers() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+    @Override
     public void init() throws UnavailableException {
     	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		
+		// Extracting parameters from request and validating them
 		String groupName = request.getParameter("groupName");
-		if (groupName == null || groupName.equals("")) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Form was not sent correctly.");
-			return;
-		}
-		
 		int duration;
 		int minMembers;
 		int maxMembers;
 		try {
+			if (groupName == null) throw new NullPointerException();
 			duration = Integer.parseInt(request.getParameter("duration"));
 			minMembers = Integer.parseInt(request.getParameter("minMembers"));
 			maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
-		} catch (NumberFormatException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Form was not sent correctly.");
+		} catch (NumberFormatException | NullPointerException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Form was not sent correctly.");
 			return;
 		}
 		
-		CreateGroupFormValidation validation = this.validateForm(groupName, duration, minMembers, maxMembers);
+		CreateGroupFormValidation validation = new CreateGroupFormValidation(groupName, duration, minMembers, maxMembers);
 		
 		GroupDAO gDAO = new GroupDAO(this.connection);
 		User user = (User)request.getSession().getAttribute("user");
-		
 		try {
 			if (!gDAO.isGroupNameAvailableForUser(user.getId(), groupName))
 				validation.addErrorMessage("You already have a group named '" + groupName + "'. Please choose another name.");
@@ -86,6 +73,7 @@ public class InviteUsers extends HttpServlet {
 		    return;
 		}
 		
+		// Fetch list of all users to be displayed
 		List<User> users;
 		try {
 			users = new UserDAO(this.connection).fetchAllUsers();
@@ -107,13 +95,26 @@ public class InviteUsers extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String groupName = request.getParameter("groupName");
-		int duration = Integer.parseInt(request.getParameter("duration"));
-		int minMembers = Integer.parseInt(request.getParameter("minMembers"));
-		int maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
+		int duration;
+		int minMembers;
+		int maxMembers;
 		String[] usersToInviteStrings = request.getParameterValues("usersToInvite[]");
 		int[] usersToInvite = new int[usersToInviteStrings.length];
-		for (int i = 0; i < usersToInvite.length; i++)
-			usersToInvite[i] = Integer.parseInt(usersToInviteStrings[i]);
+		try {
+			if (groupName == null) throw new NullPointerException();
+			duration = Integer.parseInt(request.getParameter("duration"));
+			minMembers = Integer.parseInt(request.getParameter("minMembers"));
+			maxMembers = Integer.parseInt(request.getParameter("maxMembers"));
+			for (int i = 0; i < usersToInvite.length; i++)
+				usersToInvite[i] = Integer.parseInt(usersToInviteStrings[i]);
+		} catch (NumberFormatException | NullPointerException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Form was not sent correctly.");
+			return;
+		}
+		
+		
+		
+		
 		
 		int inviteCount = usersToInvite.length;
 		
@@ -146,33 +147,12 @@ public class InviteUsers extends HttpServlet {
 		try {
 			gDAO.createNewGroup(groupName, user.getId(), duration, minMembers, maxMembers, usersToInvite);
 		} catch (SQLException e) {
-//			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
+			// response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
 			return;
 		}
 		
 		response.sendRedirect(request.getContextPath() + "/home");
-	}
-	
-	private CreateGroupFormValidation validateForm(String groupName, int duration, int minMembers, int maxMembers) {
-		CreateGroupFormValidation validation = new CreateGroupFormValidation(groupName, duration, minMembers, maxMembers);
-		
-		if (groupName.length() < 1 || groupName.length() > 100)
-			validation.addErrorMessage("Group name must be within 1 and 100 characters long.");
-		
-		if (duration < 1)
-			validation.addErrorMessage("Duration must be at least 1 day.");
-		
-		if (minMembers < 1)
-			validation.addErrorMessage("Minimum amount of members must be at least 1.");
-		
-		if (maxMembers < 1)
-			validation.addErrorMessage("Maximum amount of members must be at least 1.");
-		
-		if (maxMembers < minMembers)
-			validation.addErrorMessage("Maximum amount of members cannot be less than minimum amount of members.");
-		
-		return validation;
 	}
 
 }

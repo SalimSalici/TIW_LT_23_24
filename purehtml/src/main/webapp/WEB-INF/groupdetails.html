@@ -30,7 +30,11 @@
 				</div>
 				<div class="group-info-item">
 					<h3>Owner</h3>
-					<p th:text="${group.groupName}">[Name Surname Username]</p>
+					<p>
+						<span th:text="${group.owner.name}">Name</span>
+						<span th:text="${group.owner.surname}">Surname</span>
+						<span th:text="${group.owner.username}" style="color: #888;">Username</span>
+					</p>
 				</div>
 				<div class="group-info-break"></div>
 				<div class="group-info-item">

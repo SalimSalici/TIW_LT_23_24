@@ -16,15 +16,15 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class UserLoggedFilter
  */
-@WebFilter({"/home", "/inviteusers", "/creategroup", "/logout", "/cancellation", "/groupdetails"})
-public class UserLoggedFilter extends HttpFilter implements Filter {
+@WebFilter({"/auth", "/login", "/register"})
+public class VisitorFilter extends HttpFilter implements Filter {
    
 	private static final long serialVersionUID = 1L;
 
 	/**
      * @see HttpFilter#HttpFilter()
      */
-    public UserLoggedFilter() {
+    public VisitorFilter() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -43,8 +43,8 @@ public class UserLoggedFilter extends HttpFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
         HttpSession session = httpRequest.getSession();
         
-		if (session.isNew() || session.getAttribute("user") == null) {
-			((HttpServletResponse) response).sendRedirect(httpRequest.getContextPath() + "/auth");
+		if (session.getAttribute("user") != null) {
+			((HttpServletResponse) response).sendRedirect(httpRequest.getContextPath() + "/home");
 			return;
 		}
 			

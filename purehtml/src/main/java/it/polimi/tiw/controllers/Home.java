@@ -18,7 +18,7 @@ import org.thymeleaf.context.WebContext;
 
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
-import it.polimi.tiw.daos.GroupDAO;
+import it.polimi.tiw.daos.UserDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 import it.polimi.tiw.utils.ThymeleafInitializer;
 
@@ -49,12 +49,14 @@ public class Home extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		User user = (User)request.getSession().getAttribute("user");
+		
+		UserDAO uDAO = new UserDAO(this.connection);
 		List<Group> ownedGroups;
+		List<Group> otherGroups;
 		try {
-			ownedGroups = new GroupDAO(this.connection).fetchGroupsOwnedBy(user.getId());
+			ownedGroups = uDAO.fetchGroupsOwnedBy(user.getId());
+			otherGroups = uDAO.fetchGroupsWithUser(user.getId());
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
@@ -63,6 +65,7 @@ public class Home extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("ownedGroups", ownedGroups);
+		ctx.setVariable("otherGroups", otherGroups);
 		
 		templateEngine.process(path, ctx, response.getWriter());
 	}
