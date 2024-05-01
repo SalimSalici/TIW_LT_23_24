@@ -21,9 +21,9 @@
 				<div th:if="${session.loginErrorMessage != null}" class="error-box"
 					th:text="${session.loginErrorMessage}">Error message</div>
 				<label for="loginUsername">Username:</label><br>
-				<input type="text" id="loginUsername" name="loginUsername" class="textInput"><br>
+				<input type="text" id="loginUsername" name="loginUsername" class="textInput" required><br>
 				<label for="loginPassword">Password:</label><br>
-				<input type="password" id="loginPassword" name="loginPassword" class="textInput"><br>
+				<input type="password" id="loginPassword" name="loginPassword" class="textInput" required><br>
 				<div class="toggle-wrapper">
 					<input type="checkbox" class="toggle-input">
 					<span style="position: relative; top: -4px; left: 5px; color: #404040">
@@ -38,7 +38,7 @@
 			<h2>Registration Form</h2>
 			<form method="POST" th:action="@{/register}">
 				<label for="registerUsername">Username:</label><br>
-				<input type="text" id="registerUsername" name="registerUsername" class="textInput"
+				<input type="text" id="registerUsername" name="registerUsername" class="textInput" required
 					th:value="${session.registerValidation != null && session.registerValidation.username != null ? session.registerValidation.username : '' }"><br>
 				<div class="error-box"
 					th:if="${session.registerValidation != null && session.registerValidation.usernameError != null}"
@@ -54,7 +54,7 @@
 					Error message
 				</div>
 				<label for="registerSurname">Surname:</label><br>
-				<input type="text" id="registerSurname" name="registerSurname" class="textInput"
+				<input type="text" id="registerSurname" name="registerSurname" class="textInput" required
 					th:value="${session.registerValidation != null && session.registerValidation.surname != null ? session.registerValidation.surname : '' }"><br>
 				<div class="error-box"
 					th:if="${session.registerValidation != null && session.registerValidation.surnameError != null}"
@@ -62,7 +62,7 @@
 					Error message
 				</div>
 				<label for="registerEmail">Email:</label><br>
-				<input type="email" id="registerEmail" name="registerEmail" class="textInput"
+				<input type="email" id="registerEmail" name="registerEmail" class="textInput" required
 					th:value="${session.registerValidation != null && session.registerValidation.email != null ? session.registerValidation.email : '' }"><br>
 				<div class="error-box"
 					th:if="${session.registerValidation != null && session.registerValidation.emailError != null}"
@@ -70,14 +70,14 @@
 					Error message
 				</div>
 				<label for="registerPassword">Password:</label><br>
-				<input type="password" id="registerPassword" name="registerPassword" class="textInput"><br>
+				<input type="password" id="registerPassword" name="registerPassword" class="textInput" required><br>
 				<div class="error-box"
 					th:if="${session.registerValidation != null && session.registerValidation.passwordError != null}"
 					th:text="${session.registerValidation.passwordError}">
 					Error message
 				</div>
 				<label for="registerConfirmPassword">Confirm Password:</label><br>
-				<input type="password" id="registerConfirmPassword" name="registerConfirmPassword"
+				<input type="password" id="registerConfirmPassword" name="registerConfirmPassword" required
 					class="textInput"><br>
 				<div class="error-box"
 					th:if="${session.registerValidation != null && session.registerValidation.confirmPasswordError != null}"

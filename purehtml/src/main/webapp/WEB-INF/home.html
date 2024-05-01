@@ -22,7 +22,6 @@
 		</h1>
 
 		<form th:action="@{/inviteusers}" action="#" method="GET">
-			<!-- <input type="hidden" name="attempt" value="0"> -->
 			<div class="error-box" th:if="${session.createGroupValidation != null}">
 				<ul th:remove="all-but-first">
 					<li th:each="errorMessage : ${session.createGroupValidation.errorMessages}" th:text="${errorMessage}">Error message 0</li>
@@ -44,12 +43,14 @@
 				</div>
 
 				<div class="input-field">
-					<label for="minMembers">Minimum Members:</label> <input type="number" id="minMembers" name="minMembers" min="1" required
+					<label for="minMembers">Minimum Members:</label>
+					<input type="number" id="minMembers" name="minMembers" min="1" required
 						th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.minUsers} : ''">
 				</div>
 
 				<div class="input-field">
-					<label for="maxMembers">Maximum Members:</label> <input type="number" id="maxMembers" name="maxMembers" min="1" required
+					<label for="maxMembers">Maximum Members:</label>
+					<input type="number" id="maxMembers" name="maxMembers" min="1" required
 						th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.maxUsers} : ''">
 				</div>
 			</div>

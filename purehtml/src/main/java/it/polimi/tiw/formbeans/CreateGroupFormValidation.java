@@ -22,7 +22,7 @@ public class CreateGroupFormValidation {
 
 	public void setName(String name) {
 		if (name == null)
-			this.errorMessages.add("Missing grop name.");
+			this.errorMessages.add("Missing group name.");
 		else if (name.length() < 1 || name.length() > 100)
 			this.errorMessages.add("Group name must be within 1 and 100 characters long.");
 		

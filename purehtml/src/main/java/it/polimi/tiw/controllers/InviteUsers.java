@@ -112,10 +112,6 @@ public class InviteUsers extends HttpServlet {
 			return;
 		}
 		
-		
-		
-		
-		
 		int inviteCount = usersToInvite.length;
 		
 		boolean error = false;
