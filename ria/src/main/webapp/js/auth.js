@@ -74,21 +74,21 @@
             console.log("Making post call");
             let formData = new FormData(registerForm);
             registerFieldset.disabled = true;
-            makeCall("POST", "register", formData, (response) => {
-                if (response.readyState == XMLHttpRequest.DONE) {
-                    switch (response.status) {
+            makeCall("POST", "register", formData, (req) => {
+                if (req.readyState == XMLHttpRequest.DONE) {
+                    switch (req.status) {
                         case 200:
-                            console.log("Register successfull", response);
+                            console.log("Register successfull", req);
                             break;
                         case 400:
-                            let errors = JSON.parse(response.responseText);
+                            let errors = JSON.parse(req.responseText);
                             createPopup("Registration failed", "error", 5000);
                             for (const [errorField, errorMessage] of Object.entries(errors))
                                 registerFields[errorField].displayError(errorMessage);
                             break;
                         default:
-                            console.log(response)
-                            createPopup("Error " + response.status + ": " + response.responseText, "error", 5000);
+                            console.log(req)
+                            createPopup("Error " + req.status + ": " + req.responseText, "error", 5000);
                     }
                     registerFieldset.disabled = false;
                 }

@@ -9,6 +9,43 @@
     <link rel="stylesheet" type="text/css" media="all" href="css/homeStyle.css" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        
+    <script src="js/utils.js"></script>
+	<script src="js/forms.js"></script>
+	
+	<style>
+		#popup-container {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			z-index: 1000;
+		}
+
+		.popup-message {
+			color: white;
+			padding: 15px 30px;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+			opacity: 0;
+			transition: opacity 0.5s;
+		}
+
+		.success {
+			background-color: #28a745;
+			/* Green */
+		}
+
+		.error {
+			background-color: #dc3545;
+			/* Red */
+		}
+
+		.info {
+			background-color: #17a2b8;
+			/* Blue */
+		}
+	</style>
 </head>
 
 <body>
@@ -35,10 +72,10 @@
     <div class="wrapper">
 
         <h1 style="margin-top: 40px">
-            Welcome <span th:if="${session.user != null}" th:text="${session.user.username}">[name]</span>
+            Welcome <span id="welcomeNameText">[name]</span>
         </h1>
 
-        <form th:action="@{/inviteusers}" action="#" method="GET">
+        <!-- <form action="#" method="GET">
             <div class="error-box" th:if="${session.createGroupValidation != null}">
                 <ul th:remove="all-but-first">
                     <li th:each="errorMessage : ${session.createGroupValidation.errorMessages}"
@@ -74,82 +111,70 @@
             </div>
 
             <input type="submit" value="Create group">
-        </form>
+        </form> -->
 
         <br>
-        <h2 th:text="${#lists.isEmpty(ownedGroups)} ? 'You have not created any group yet' : 'Your active Groups:'">Your
-            active Groups:</h2>
-        <ul th:remove="all-but-first" class="group-list">
-            <li th:each="group : ${ownedGroups}" class="group-elem">
-                <h3 th:text="${group.groupName}">Group name</h3>
-                <p>
-                    <img th:src="@{/images/clock.png}" src="../images/clock.png" alt="Duration"
-                        style="height: 16px; width: 16px;">
-                    Duration:&nbsp;<span th:text="${group.duration}">4</span>&nbsp;days
-                </p>
-                <p>
-                    <img th:src="@{/images/group.png}" src="../images/group.png" alt="Members"
-                        style="height: 16px; width: 16px;">
-                    Members:&nbsp;<span th:text="${group.userCount}">4</span>/<span
-                        th:text="${group.maxUsers}">10</span>
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
+        <h2>Your active Groups:</h2>
+        <ul id="ownedActiveGroupsContainer" class="group-list">
+            <li id="groupContainerTemplate" class="group-elem" style="display: none">
                 <div class="group-details-preview">
-                    <h3>Group 2</h3>
+                    <h3 data-templ="groupDetailsName">[Group Name]</h3>
                     <p>
-                        <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 6 Days
+                        <img src="images/clock.png" alt="Duration"> Duration:&nbsp;<span data-templ="groupPreviewDuration">6</span>&nbsp;Days
                     </p>
                     <p>
-                        <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 5/15
+                        <img src="images/group.png" alt="Members">
+                        Members:&nbsp;
+                        <span data-templ="groupPreviewMemberCount">5</span>
+						/
+						<span data-templ="groupPreviewMaxUsers">15</span>
                     </p>
                 </div>
-                <div class="group-details-container">
+                <div data-templ="groupDetailsContainer" class="group-details-container">
                     <div class="group-info-container">
                         <div class="group-info-item">
                             <h3>Group name</h3>
-                            <p th:text="${group.groupName}">[Name of group]</p>
+                            <p data-templ="groupInfoName">[Name of group]</p>
                         </div>
                         <div class="group-info-item">
                             <h3>Owner</h3>
                             <p>
-                                <span th:text="${group.owner.name}">Name</span>&nbsp;
-                                <span th:text="${group.owner.surname}">Surname</span>&nbsp;
-                                <span th:text="${group.owner.username}" style="color: #888;">Username</span>
+                                <span data-templ="groupInfoOwnerName">Name</span>&nbsp;
+                                <span data-templ="groupInfoOwnerSurame">Surname</span>&nbsp;
+                                <span data-templ="groupInfoOwnerUsername" style="color: #888;">Username</span>
                             </p>
                         </div>
                         <div class="group-info-break"></div>
                         <div class="group-info-item">
                             <h3>Duration</h3>
-                            <p><span th:text="${group.duration}">0</span> days</p>
+                            <p><span data-templ="groupInfoDuration">0</span>&nbsp;days</p>
                         </div>
                         <div class="group-info-item">
                             <h3>Creation date</h3>
-                            <p th:text="${group.createdAt}">23/02/2024</p>
+                            <p data-templ="groupInfoCreatedAt">23/02/2024</p>
                         </div>
                         <div class="group-info-item">
                             <h3>End date</h3>
-                            <p th:text="${group.endDate}">23/02/2024</p>
+                            <p data-templ="groupInfoEndDate">23/02/2024</p>
                         </div>
                         <div class="group-info-break"></div>
                         <div class="group-info-item">
                             <h3>Member count</h3>
-                            <p th:text="${group.userCount}">0</p>
+                            <p data-templ="groupInfoMemeberCount">0</p>
                         </div>
                         <div class="group-info-item">
                             <h3>Minimum members</h3>
-                            <p th:text="${group.minUsers}">0</p>
+                            <p data-templ="groupInfoMinMembers">0</p>
                         </div>
                         <div class="group-info-item">
                             <h3>Maximum members</h3>
-                            <p th:text="${group.maxUsers}">0</p>
+                            <p data-templ="groupInfoMaxMembers">0</p>
                         </div>
                     </div>
                     <h3>Members </h3>
                     <div class="users-trash-container">
-                        <div class="users-container" th:remove="all-but-first">
-                            <div class="user-tile-container" th:each="groupUser : ${groupUsers}" draggable="true">
+                        <div class="users-container">
+                            <div class="user-tile-container" draggable="true" style="display: none">
                                 <span class="user-box-tile">
                                     <span class="user-box-icon">
                                         <span class="material-symbols-outlined"> account_circle </span>
@@ -161,7 +186,7 @@
                                     </span>
                                 </span>
                             </div>
-                            <div class="user-tile-container">
+                            <!-- <div class="user-tile-container">
                                 <span class="user-box-tile">
                                     <span class="user-box-icon">
                                         <span class="material-symbols-outlined"> account_circle </span>
@@ -215,56 +240,58 @@
                                         <span>Name Surname</span>
                                     </span>
                                 </span>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="trash-container">
-                            T
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <button class="group-details-btn">View Details</button>
+                <button data-templ="toggleDetailsBtn" class="group-details-btn">View Details</button>
             </li>
-            <li class="group-elem">
+            <!-- <li class="group-elem">
                 <h3>Group 3</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 4</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 5</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 6</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
                 </p>
                 <button class="group-details-btn">View Details</button>
-            </li>
+            </li> -->
         </ul>
 
         <br>
@@ -273,13 +300,11 @@
             <li th:each="group : ${otherGroups}" class="group-elem">
                 <h3 th:text="${group.groupName}">Group name</h3>
                 <p>
-                    <img th:src="@{/images/clock.png}" src="../images/clock.png" alt="Duration"
-                        style="height: 16px; width: 16px;">
+                    <img src="images/clock.png" alt="Duration">
                     Duration:&nbsp;<span th:text="${group.duration}">4</span>&nbsp;days
                 </p>
                 <p>
-                    <img th:src="@{/images/group.png}" src="../images/group.png" alt="Members"
-                        style="height: 16px; width: 16px;">
+                    <img src="images/group.png" alt="Members">
                     Members:&nbsp;<span th:text="${group.userCount}">4</span>/<span
                         th:text="${group.maxUsers}">10</span>
                 </p>
@@ -288,55 +313,57 @@
             <li class="group-elem">
                 <h3>Group 2</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 6 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 6 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 5/15
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 5/15
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 3</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 4</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 5</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
             <li class="group-elem">
                 <h3>Group 6</h3>
                 <p>
-                    <img src="time-left.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
+                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
                 </p>
                 <p>
-                    <img src="group-chat.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
+                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
                 </p>
                 <button class="group-details-btn">View Details</button>
             </li>
         </ul>
     </div>
+    
+    <div id="popup-container"></div>
 
     <script>
         var buttons = document.getElementsByClassName("group-details-btn");
@@ -353,6 +380,30 @@
         }
 
     </script>
+    
+    <script>
+		function createPopup(message, type, duration) {
+			const container = document.getElementById('popup-container');
+			const popup = document.createElement('div');
+			popup.className = `popup-message ${type}`;
+			popup.textContent = message;
+
+			container.appendChild(popup);
+
+			// Make the popup visible
+			setTimeout(() => {
+				popup.style.opacity = 1;
+			}, 100);
+
+			// Remove the popup after a user-defined duration
+			setTimeout(() => {
+				popup.style.opacity = 0;
+				setTimeout(() => container.removeChild(popup), 500);
+			}, duration);
+		}
+	</script>
+    
+    <script src="js/home.js"></script>
 
 </body>
 

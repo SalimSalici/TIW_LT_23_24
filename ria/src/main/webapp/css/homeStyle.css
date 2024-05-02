@@ -97,6 +97,8 @@ input[type=submit]:hover {
 
 .group-elem p img {
 	margin-right: 10px;
+	height: 16px;
+    width: 16px;
 }
 
 .group-details-preview p {
@@ -192,5 +194,18 @@ input[type=submit]:hover {
 }
 
 .trash-container {
-    background-color: #f00;
+    background-color: #ff1f1f;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: 3px solid #ffcbcb;
+}
+
+button:disabled {
+	background-color: #8c9d9c !important;
+	cursor: wait !important;
 }
