@@ -1,0 +1,127 @@
+@charset "UTF-8";
+
+.mainContainer {
+	margin-top: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	/* min-width: 400px; */
+	/* height: 100vh; */
+	flex-direction: column;
+	flex-wrap: nowrap;
+	/* gap: 100px; */
+}
+
+form {
+	min-width: 600px;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+}
+
+h2 {
+	padding-left: 20px;
+	margin-bottom: 20px;
+}
+
+label {
+	font-weight: bold;
+}
+
+.textInput {
+	width: 100%;
+	padding: 10px;
+	margin: 5px 0 20px 0;
+	box-sizing: border-box;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+input[type="submit"] {
+	width: 100%;
+	background-color: #009688;
+	color: white;
+	padding: 14px 20px;
+	margin: 8px 0;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 200ms;
+}
+
+input[type="submit"]:hover {
+	background-color: #008a7c;
+}
+
+input[type="submit"]:disabled {
+	background-color: #8c9d9c !important;
+	cursor: wait !important;
+}
+
+.toggle-wrapper {
+	margin-top: -6px;
+}
+
+.toggle-wrapper .toggle-input {
+	appearance: none;
+	background-color: #dfe1e4;
+	border-radius: 72px;
+	border-style: none;
+	flex-shrink: 0;
+	height: 20px;
+	margin: 0;
+	position: relative;
+	width: 30px;
+}
+
+.toggle-wrapper .toggle-input::before {
+	bottom: -6px;
+	content: "";
+	left: -6px;
+	position: absolute;
+	right: -6px;
+	top: -6px;
+}
+
+.toggle-wrapper .toggle-input, .toggle-wrapper .toggle-input::after {
+	transition: all 100ms ease-out;
+}
+
+.toggle-wrapper .toggle-input::after {
+	background-color: #fff;
+	border-radius: 50%;
+	content: "";
+	height: 14px;
+	left: 3px;
+	position: absolute;
+	top: 3px;
+	width: 14px;
+}
+
+.toggle-wrapper input[type=checkbox] {
+	cursor: default;
+}
+
+.toggle-wrapper .toggle-input:hover {
+	background-color: #c9cbcd;
+	transition-duration: 0s;
+}
+
+.toggle-wrapper .toggle-input:checked {
+	background-color: #009688;
+}
+
+.toggle-wrapper .toggle-input:checked::after {
+	background-color: #fff;
+	left: 13px;
+}
+
+.toggle-wrapper :focus:not(.focus-visible) {
+	outline: 0;
+}
+
+.toggle-wrapper .toggle-input:checked:hover {
+	background-color: #017e71;
+}

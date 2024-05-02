@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Work Groups - Authentication</title>
+	<link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="css/authStyle.css" />
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+	<style>
+		/* styles.css */
+		#popup-container {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			z-index: 1000;
+		}
+
+		.popup-message {
+			color: white;
+			padding: 15px 30px;
+			margin-bottom: 10px;
+			border-radius: 5px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+			opacity: 0;
+			transition: opacity 0.5s;
+		}
+
+		.success {
+			background-color: #28a745;
+			/* Green */
+		}
+
+		.error {
+			background-color: #dc3545;
+			/* Red */
+		}
+
+		.info {
+			background-color: #17a2b8;
+			/* Blue */
+		}
+	</style>
+	<script src="js/utils.js"></script>
+	<script src="js/forms.js"></script>
+</head>
+
+<body>
+	<header class="top-menu">
+		<div class="wrapper">
+			<div class="top-menu-container">
+				<div>
+					<a href="#">
+						<span class="material-symbols-outlined" style="font-size: 28px;">hub</span>
+						<span style="position: relative; top: -6px; left: 10px">
+							<b>Work Groups</b>
+						</span>
+					</a>
+				</div>
+				<div class="right-menu">
+					<a href="#profile" class="nav-item">Profile</a>
+					<a href="#" class="nav-item">Logout</a>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="mainContainer">
+		<div>
+			<h2>Login Form</h2>
+			<form id="loginForm" method="POST" action="login">
+				<fieldset>
+					<div id="loginErrorBox" class="error-box">Error message</div>
+					<label for="loginUsername">Username:</label><br>
+					<input type="text" id="loginUsername" name="loginUsername" class="textInput" required
+						maxlength="45"><br>
+					<label for="loginPassword">Password:</label><br>
+					<input id="loginPasswordErrorBox" type="password" id="loginPassword" name="loginPassword"
+						class="textInput" required maxlength="255"><br>
+					<div class="toggle-wrapper">
+						<input type="checkbox" class="toggle-input">
+						<span style="position: relative; top: -4px; left: 5px; color: #404040">
+							Remember me
+						</span>
+					</div>
+					<input id="loginSubmitBtn" type="submit" value="Login">
+				</fieldset>
+			</form>
+		</div>
+
+		<div>
+			<h2>Registration Form</h2>
+			<form id="registerForm" method="POST" action="register">
+				<fieldset>
+					<label for="registerUsername">Username:</label><br>
+					<input type="text" id="registerUsername" name="registerUsername" class="textInput" required><br>
+					<div id="registerUsernameErrorBox" class="error-box">Error message</div>
+					<label for="registerName">Name:</label><br>
+					<input type="text" id="registerName" name="registerName" class="textInput"><br>
+					<div id="registerNameErrorBox" class="error-box">Error message</div>
+					<label for="registerSurname">Surname:</label><br>
+					<input type="text" id="registerSurname" name="registerSurname" class="textInput" required><br>
+					<div id="registerSurnameErrorBox" class="error-box">Error message</div>
+					<label for="registerEmail">Email:</label><br>
+					<input type="email" id="registerEmail" name="registerEmail" class="textInput" required><br>
+					<div id="registerEmailErrorBox" class="error-box">Error message</div>
+					<label for="registerPassword">Password:</label><br>
+					<input type="password" id="registerPassword" name="registerPassword" class="textInput" required><br>
+					<div id="registerPasswordErrorBox" class="error-box">Error message</div>
+					<label for="registerConfirmPassword">Confirm Password:</label><br>
+					<input type="password" id="registerConfirmPassword" name="registerConfirmPassword" required
+						class="textInput"><br>
+					<div id="registerConfirmPasswordErrorBox" class="error-box">Error message</div>
+					<input id="registerSubmitBtn" type="submit" value="Register">
+				</fieldset>
+			</form>
+		</div>
+	</div>
+
+	<div id="popup-container"></div>
+
+	<script src="js/auth.js"></script>
+	<script>
+		function createPopup(message, type, duration) {
+			const container = document.getElementById('popup-container');
+			const popup = document.createElement('div');
+			popup.className = `popup-message ${type}`;
+			popup.textContent = message;
+
+			container.appendChild(popup);
+
+			// Make the popup visible
+			setTimeout(() => {
+				popup.style.opacity = 1;
+			}, 100);
+
+			// Remove the popup after a user-defined duration
+			setTimeout(() => {
+				popup.style.opacity = 0;
+				setTimeout(() => container.removeChild(popup), 500);
+			}, duration);
+		}
+	</script>
+</body>
+
+</html>
