@@ -172,75 +172,20 @@
                         </div>
                     </div>
                     <h3>Members </h3>
-                    <div class="users-trash-container">
+                    <div class="users-trash-container no-trash">
                         <div class="users-container">
-                            <div class="user-tile-container" draggable="true" style="display: none">
+                            <div data-templ="userTileTemplate" class="user-tile-container" draggable="true" style="display: none">
                                 <span class="user-box-tile">
                                     <span class="user-box-icon">
                                         <span class="material-symbols-outlined"> account_circle </span>
                                     </span>
                                     <span class="user-box-label">
-                                        <span th:text="${groupUser.username}">Username</span><br>
-                                        <span th:text="${groupUser.name} + ' ' + ${groupUser.surname}">Name
-                                            Surname</span>
+                                        <span data-templ="groupMemberUsername">Username</span><br>
+                                        <span data-templ="groupMemberName">Name</span>
+                                        <span data-templ="groupMemberSurname">Surname</span>
                                     </span>
                                 </span>
                             </div>
-                            <!-- <div class="user-tile-container">
-                                <span class="user-box-tile">
-                                    <span class="user-box-icon">
-                                        <span class="material-symbols-outlined"> account_circle </span>
-                                    </span>
-                                    <span class="user-box-label">
-                                        <span>Username</span><br>
-                                        <span>Name Surname</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="user-tile-container">
-                                <span class="user-box-tile">
-                                    <span class="user-box-icon">
-                                        <span class="material-symbols-outlined"> account_circle </span>
-                                    </span>
-                                    <span class="user-box-label">
-                                        <span>Username</span><br>
-                                        <span>Name Surname</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="user-tile-container">
-                                <span class="user-box-tile">
-                                    <span class="user-box-icon">
-                                        <span class="material-symbols-outlined"> account_circle </span>
-                                    </span>
-                                    <span class="user-box-label">
-                                        <span>Username</span><br>
-                                        <span>Name Surname</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="user-tile-container">
-                                <span class="user-box-tile">
-                                    <span class="user-box-icon">
-                                        <span class="material-symbols-outlined"> account_circle </span>
-                                    </span>
-                                    <span class="user-box-label">
-                                        <span>Username</span><br>
-                                        <span>Name Surname</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="user-tile-container">
-                                <span class="user-box-tile">
-                                    <span class="user-box-icon">
-                                        <span class="material-symbols-outlined"> account_circle </span>
-                                    </span>
-                                    <span class="user-box-label">
-                                        <span>Username</span><br>
-                                        <span>Name Surname</span>
-                                    </span>
-                                </span>
-                            </div> -->
                         </div>
                         <div class="trash-container">
                             <span class="material-symbols-outlined">
@@ -252,46 +197,6 @@
 
                 <button data-templ="toggleDetailsBtn" class="group-details-btn">View Details</button>
             </li>
-            <!-- <li class="group-elem">
-                <h3>Group 3</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 4</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 5</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 6</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li> -->
         </ul>
 
         <br>

@@ -205,6 +205,14 @@ input[type=submit]:hover {
     border: 3px solid #ffcbcb;
 }
 
+.users-trash-container.no-trash {
+	display: block;
+}
+
+.no-trash .trash-container {
+    display: none;
+}
+
 button:disabled {
 	background-color: #8c9d9c !important;
 	cursor: wait !important;

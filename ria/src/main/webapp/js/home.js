@@ -62,8 +62,6 @@
 		this.groupDetailsContainer = _groupDetailsContainer;
 		this.toggleBtnEl = _toggleBtnEl;
 		
-		this.usersContainer = this.groupDetailsContainer.querySelector(".users-container");
-		
 		this.groupInfoName = this.groupDetailsContainer.querySelector("[data-templ=groupInfoName]");
 		this.groupInfoOwnerName = this.groupDetailsContainer.querySelector("[data-templ=groupInfoOwnerName]");
 		this.groupInfoOwnerSurame = this.groupDetailsContainer.querySelector("[data-templ=groupInfoOwnerSurame]");
@@ -75,9 +73,16 @@
 		this.groupInfoMinMembers = this.groupDetailsContainer.querySelector("[data-templ=groupInfoMinMembers]");
 		this.groupInfoMaxMembers = this.groupDetailsContainer.querySelector("[data-templ=groupInfoMaxMembers]");
 
+		this.usersTrashContainer = this.groupDetailsContainer.querySelector(".users-trash-container");
+		this.usersContainer = this.groupDetailsContainer.querySelector(".users-container");
+		this.trashBtn = this.groupDetailsContainer.querySelector(".trash-container");
+		this.userTileTemplate = this.groupDetailsContainer.querySelector("[data-templ=userTileTemplate]");
+
 		this.toggleBtnEl.addEventListener("click", evt => {
 			if (self.groupEl.classList.contains("group-expanded")) { // close group details
 				self.groupEl.classList.remove("group-expanded");
+				self.usersContainer.innerHTML = "";
+				console.log(self.usersContainer);
 			} else { // fetch group data and members and display
 				this.toggleBtnEl.disabled = true;
 				self.fetchAndExpand();
@@ -93,7 +98,6 @@
 							let json = JSON.parse(req.responseText);
 							self.expand(json.group, json.users);
 							break;
-							
 					}
 				}
 					
@@ -101,6 +105,8 @@
 		}
 		
 		this.expand = function(group, users) {
+			
+			// Group info
 			this.groupInfoName.innerText = group.groupName;
 			this.groupInfoOwnerName.innerText = group.owner.name;
 			this.groupInfoOwnerSurame.innerText = group.owner.surname;
@@ -111,6 +117,25 @@
 			this.groupInfoMemeberCount.innerText = group.userCount;
 			this.groupInfoMinMembers.innerText = group.minUsers;
 			this.groupInfoMaxMembers.innerText = group.maxUsers;
+			
+			// Member list
+			for (let i  = 0; i < users.length; i++) {
+				let user = users[i];
+				let userTile = this.userTileTemplate.cloneNode(true);
+				userTile.removeAttribute("id");
+				userTile.removeAttribute("style");
+
+				let groupMemberUsername = userTile.querySelector("[data-templ=groupMemberUsername]");
+				groupMemberUsername.innerText = user.username;
+				
+				let groupMemberName = userTile.querySelector("[data-templ=groupMemberName]");
+				groupMemberName.innerText = user.name;
+				
+				let groupMemberSurname = userTile.querySelector("[data-templ=groupMemberSurname]");
+				groupMemberSurname.innerText = user.surname;
+
+				this.usersContainer.appendChild(userTile);
+			}
 
 			self.groupEl.classList.add("group-expanded");
 			this.toggleBtnEl.disabled = false;
