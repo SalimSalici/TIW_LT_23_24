@@ -106,6 +106,7 @@ input[type=submit]:hover {
 }
 
 .group-details-btn {
+	cursor: pointer;
 	padding: 10px 20px;
 	background-color: #009688;
 	color: white;
@@ -136,7 +137,7 @@ input[type=submit]:hover {
 }
 
 .group-expanded {
-    grid-column: 1 / span3;
+    grid-column: 1 / 4;
 }
 
 .group-details-preview {
@@ -211,6 +212,12 @@ input[type=submit]:hover {
 
 .no-trash .trash-container {
     display: none;
+}
+
+.dragging {
+	opacity: 0.8;
+    border-color: #f00 !important;
+	background-color: #ffd5d5 !important;
 }
 
 button:disabled {

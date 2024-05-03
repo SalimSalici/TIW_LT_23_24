@@ -63,7 +63,7 @@
                 </div>
                 <div class="right-menu">
                     <a href="#profile" class="nav-item">Profile</a>
-                    <a href="#" class="nav-item">Logout</a>
+                    <a href="logout" class="nav-item">Logout</a>
                 </div>
             </div>
         </div>
@@ -201,70 +201,8 @@
 
         <br>
         <h2>Other active groups you are part of:</h2>
-        <ul th:remove="all-but-first" class="group-list">
-            <li th:each="group : ${otherGroups}" class="group-elem">
-                <h3 th:text="${group.groupName}">Group name</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration">
-                    Duration:&nbsp;<span th:text="${group.duration}">4</span>&nbsp;days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members">
-                    Members:&nbsp;<span th:text="${group.userCount}">4</span>/<span
-                        th:text="${group.maxUsers}">10</span>
-                </p>
-                <a th:href="@{/groupdetails(id=${group.id})}" href="#" class="group-details-btn">View Details</a>
-            </li>
-            <li class="group-elem">
-                <h3>Group 2</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 6 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 5/15
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 3</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 8 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 4/12
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 4</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 10 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 8/20
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 5</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 12 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 10/10
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
-            <li class="group-elem">
-                <h3>Group 6</h3>
-                <p>
-                    <img src="images/clock.png" alt="Duration" style="height: 16px; width: 16px;"> Duration: 3 Days
-                </p>
-                <p>
-                    <img src="images/group.png" alt="Members" style="height: 16px; width: 16px;"> Members: 2/5
-                </p>
-                <button class="group-details-btn">View Details</button>
-            </li>
+        <ul id="otherActiveGroupsContainer"  class="group-list">
+            
         </ul>
     </div>
     

@@ -30,7 +30,7 @@ public class Logout extends HttpServlet {
 		HttpSession session = request.getSession(false); // Get the session if it exists, do not create if it doesn't
 		if (session != null)
 			session.invalidate();
-		response.sendRedirect(request.getContextPath() + "/auth");
+		response.sendRedirect(request.getContextPath() + "/");
 	}
 
 	/**

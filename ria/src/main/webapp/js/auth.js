@@ -9,10 +9,12 @@
             let formData = new FormData(loginForm);
             loginFieldset.disabled = true;
             makeCall("POST", "login", formData, (response) => {
-                if (response.readyState == XMLHttpRequest.DONE) {
+                if (response.readyState == 4) {
                     switch (response.status) {
                         case 200:
-                            console.log("Login successfull", response);
+                            let userJsonString = response.responseText;
+                            sessionStorage.setItem("user", userJsonString);
+                            window.location.href = "home.html";
                             break;
                         case 401:
                             createPopup("Login failed", "error", 4000);
@@ -78,7 +80,9 @@
                 if (req.readyState == XMLHttpRequest.DONE) {
                     switch (req.status) {
                         case 200:
-                            console.log("Register successfull", req);
+                            let userJsonString = req.responseText;
+                            sessionStorage.setItem("user", userJsonString);
+                            window.location.href = "home.html";
                             break;
                         case 400:
                             let errors = JSON.parse(req.responseText);

@@ -21,10 +21,12 @@ public class GroupDAO {
 	
 	public Group fetchGroupById(int groupId) throws SQLException {
 		String query = 
-				  "SELECT `groups`.id AS group_id, group_name, user_id, duration, min_users, max_users, `groups`.created_at, "
+				  "SELECT `groups`.id AS group_id, group_name, `groups`.user_id, duration, min_users, max_users, `groups`.created_at, COUNT(user_groups.user_id) AS user_count, "
 				+ "username, name, surname, email FROM `groups` "
 				+ "JOIN users ON users.id = `groups`.user_id "
-				+ "WHERE `groups`.id = ? ";
+				+ "LEFT JOIN user_groups ON user_groups.group_id = `groups`.id "
+				+ "WHERE `groups`.id = ? "
+				+ "GROUP BY `groups`.id";
 		
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setInt(1, groupId);
@@ -36,6 +38,7 @@ public class GroupDAO {
 					int duration = result.getInt("duration");
 					int minUsers = result.getInt("min_users");
 					int maxUsers = result.getInt("max_users");
+					int userCount = result.getInt("user_count");
 					Date createdAt = result.getDate("created_at");
 					String ownerUsername = result.getString("username");
 					String ownerName = result.getString("name");
@@ -52,7 +55,7 @@ public class GroupDAO {
 							createdAt
 					);		
 					group.setOwner(new User(userId, ownerUsername, ownerEmail, ownerName, ownerSurname));
-			
+					group.setUserCount(userCount);
 					return group;
 				} else
 					return null;
@@ -141,6 +144,17 @@ public class GroupDAO {
 		} finally {
 			this.connection.setAutoCommit(true);
 		}
-
+	}
+	
+	public boolean removeMemberFromGroup(int groupId, int memberId) throws SQLException {
+		String query = "DELETE FROM user_groups WHERE group_id = ? AND user_id = ?";
+		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
+			pstatement.setInt(1, groupId);
+			pstatement.setInt(2, memberId);
+			
+			int deleted = pstatement.executeUpdate();
+			if (deleted == 1) return true;
+			else return false;
+		}
 	}
 }

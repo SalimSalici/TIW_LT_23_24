@@ -61,7 +61,10 @@ public class GroupDetails extends HttpServlet {
 			users = gDAO.fetchUsersOfGroup(groupId);
 			group.setUserCount(users.size());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().append(e.getMessage());
+			response.getWriter().append("Group not found.");
+			
 //			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
