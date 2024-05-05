@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
-
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.daos.GroupDAO;
@@ -27,7 +25,6 @@ import it.polimi.tiw.utils.DatabaseInitializer;
 public class RemoveGroupMember extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-	private Gson gson;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -38,7 +35,6 @@ public class RemoveGroupMember extends HttpServlet {
     }
     
     public void init() throws UnavailableException {
-    	this.gson = new Gson();
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 

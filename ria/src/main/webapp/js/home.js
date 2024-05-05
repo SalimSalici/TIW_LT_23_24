@@ -17,6 +17,174 @@
 
 	const loggedUser = JSON.parse(sessionStorage.getItem("user"));
 	document.getElementById("welcomeNameText").innerText = loggedUser.username;
+	
+	let ownedGroupsManager = new GroupsManager("ownedactivegroups", document.getElementById("ownedActiveGroupsContainer"));
+	ownedGroupsManager.fetchAndDisplayGroups();
+
+	let otherGroupsManager = new GroupsManager("activegroups", document.getElementById("otherActiveGroupsContainer"));
+	otherGroupsManager.fetchAndDisplayGroups();
+	
+	let createGroupManager = new CreateGroupManager();
+
+	function CreateGroupManager() {
+		let self = this;
+
+		this.form = document.getElementById("createGroupForm");
+		this.groupNameInput = document.getElementById("groupNameInput");
+		this.durationInput = document.getElementById("durationInput");
+		this.minMembersInput = document.getElementById("minMembersInput");
+		this.maxMembersInput = document.getElementById("maxMembersInput");
+		this.goToUserSelectionBtn = document.getElementById("goToUserSelectionBtn");
+		this.cancelGroupCreationBtn = document.getElementById("cancelGroupCreationBtn");
+		this.modalContainer = document.getElementById("modalContainer");
+		this.attemptText = document.getElementById("attemptText");
+		this.inviteMemberListContainer = document.getElementById("inviteMemberListContainer");
+		
+		this.userCheckboxTemplate = document.getElementById("userCheckboxTemplate");
+
+		this.attempt = 1;
+
+		this.users = [];
+
+		this.goToUserSelectionBtn.addEventListener("click", evt => {
+			evt.preventDefault();
+			evt.stopImmediatePropagation();
+			evt.stopPropagation();
+
+			if (self.form.checkValidity()) {
+				
+				makeCall("GET", "users", null, (req) => {
+					if (req.readyState === 4) {
+						switch (req.status) {
+							case 200:
+								self.users = JSON.parse(req.responseText);
+								self.displayUserSelection();
+								break;
+							case 403:
+								window.location.href = req.getResponseHeader("Location");
+								window.sessionStorage.removeItem("user");
+								break;
+							default:
+								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
+									req.responseText : "Error fetching all users";
+								createPopup(errorMsg, "error", 5000);
+						}
+					}
+				});
+
+			} else {
+				self.form.reportValidity();
+				createPopup("Please fill in all fields correctly", "error", 5000);
+			}
+		});
+
+		this.form.addEventListener("submit", evt => {
+			evt.preventDefault();
+			evt.stopImmediatePropagation();
+			evt.stopPropagation();
+			
+			if (self.form.checkValidity()) {
+				let formData = new FormData(self.form);
+				let usersCount = formData.getAll("usersToInvite[]").length;
+
+				let errorMessage = null;
+				let shortage = self.minMembersInput.value - usersCount;
+				let excess = usersCount - self.maxMembersInput.value;
+				if (shortage > 0) {
+					errorMessage = "Not enough users selected. Select at least " + shortage + " more.";
+				} else if (excess > 0) {
+					errorMessage = "Too many users selected. Deselect at least " + excess + " user(s).";
+				}
+
+				if (usersCount < self.minMembersInput.value || usersCount > self.maxMembersInput.value) {
+					self.attempt++;
+					self.attemptText.innerText = self.attempt;
+					
+					if (self.attempt <= 3) {
+						createPopup(errorMessage, "error", 5000);	
+					} else {
+						self.form.reset();
+						self.closeModal();
+						createPopup("Group creation cancelled because you exceeded 3 attempts. Please start over.", "error", 5000);
+					}
+					
+					return;
+				}
+
+				makeCall("POST", "creategroup", formData, req => {
+					if (req.readyState == 4) {
+						switch (req.status) {
+							case 200:
+								ownedGroupsManager.fetchAndDisplayGroups();
+								otherGroupsManager.fetchAndDisplayGroups();
+								self.form.reset();
+								self.closeModal();
+								createPopup("Group created successfully.", "success", 5000);
+								break;
+							case 403:
+								window.location.href = req.getResponseHeader("Location");
+								window.sessionStorage.removeItem("user");
+								break;
+							default:
+								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
+									req.responseText : "Error fetching all users";
+								createPopup(errorMsg, "error", 5000);
+						}
+					}
+				})
+
+			} else {
+				self.form.reportValidity();
+				self.closeModal();
+				createPopup("Please fill in all fields correctly", "error", 5000);
+			}
+		})
+		
+		this.cancelGroupCreationBtn.addEventListener("click", evt => {
+			self.form.reset();
+			self.closeModal();
+		});
+
+		this.displayUserSelection = function () {
+			self.attemptText.innerText = self.attempt = 1;
+			self.inviteMemberListContainer.innerHTML = "";
+			for (let i = 0; i < this.users.length; i++) {
+				let user = self.users[i];
+				let userCheckbox = self.userCheckboxTemplate.cloneNode(true);
+				userCheckbox.removeAttribute("id");
+				userCheckbox.removeAttribute("style");
+
+				let userCheckboxInput = userCheckbox.querySelector("[name=usersToInvite\\[\\]]");
+				userCheckboxInput.setAttribute("value", user.id);
+
+				let name = userCheckbox.querySelector("[data-templ=name]");
+				name.innerText = user.name;
+
+				let surname = userCheckbox.querySelector("[data-templ=surname]");
+				surname.innerText = user.surname;
+
+				self.inviteMemberListContainer.appendChild(userCheckbox);
+			}
+
+			self.openModal();
+		}
+
+		this.openModal = function () {
+			this.modalContainer.style.display = "block";
+			setTimeout(() => {
+				this.modalContainer.classList.remove("modal-hidden");
+			}, 100);
+		}
+
+		this.closeModal = function () {
+			this.modalContainer.classList.add("modal-hidden");
+			setTimeout(() => {
+				this.modalContainer.style.display = "none";
+			}, 300);
+		}
+	}
+
+	asd = new CreateGroupManager();
 
 	function GroupsManager(_url, _containerEl) {
 		let self = this;
@@ -101,7 +269,7 @@
 		this.usersContainer = this.groupDetailsContainer.querySelector(".users-container");
 		this.trashBtn = this.groupDetailsContainer.querySelector(".trash-container");
 		this.userTileTemplate = this.groupDetailsContainer.querySelector("[data-templ=userTileTemplate]");
-		
+
 		this.dragged = null;
 
 		this.toggleBtnEl.addEventListener("click", evt => {
@@ -139,10 +307,6 @@
 
 		this.expand = function (group, users) {
 
-			if (group.userId == loggedUser.id) {
-				this.setupTrash(group);
-			}
-
 			// Group info
 			this.groupInfoName.innerText = group.groupName;
 			this.groupInfoOwnerName.innerText = group.owner.name;
@@ -173,14 +337,19 @@
 				groupMemberSurname.innerText = user.surname;
 
 				let userBoxTile = userTile.querySelector(".user-box-tile");
-				userTile.addEventListener('dragstart', evt => {
-					userBoxTile.classList.add("dragging");
-					self.dragged = evt.target;
-				});
-
-				userTile.addEventListener('dragend', evt => {
-					userBoxTile.classList.remove("dragging");
-				});
+				
+				if (self.group.userId == loggedUser.id) {
+					userTile.addEventListener('dragstart', evt => {
+						userBoxTile.classList.add("dragging");
+						self.dragged = evt.target;
+					});
+	
+					userTile.addEventListener('dragend', evt => {
+						userBoxTile.classList.remove("dragging");
+					});	
+				} else {
+					userTile.removeAttribute("draggable");
+				}
 
 				this.usersContainer.appendChild(userTile);
 			}
@@ -188,26 +357,31 @@
 			self.groupEl.classList.add("group-expanded");
 			this.toggleBtnEl.disabled = false;
 		}
-		
-		this.setupTrash = function(group) {
+
+		this.setupTrash = function () {
 			this.usersTrashContainer.classList.remove("no-trash");
-			
+
 			this.trashBtn.addEventListener('dragover', function (evt) {
-		        evt.preventDefault();  // Necessary to allow dropping
-		    });
-		    
+				evt.preventDefault();  // Necessary to allow dropping
+			});
+
 			this.trashBtn.addEventListener("drop", evt => {
 				
+				if (self.dragged === null) {
+					createPopup("Please, drop a valid user of this group.", "error", 5000);
+					return;
+				}
+
 				// Client side check that minimum member requirment is satisfied after user removal
 				if (self.group.userCount - 1 < self.group.minUsers) {
 					createPopup("Group cannot have less than the current amount of members.", "error", 5000);
 					return;
 				}
-				
+
 				// Send request to server to remove the user
 				let memberId = self.dragged.getAttribute("data-memberid");
 				let formData = new FormData();
-				formData.append("groupId", group.id);
+				formData.append("groupId", self.group.id);
 				formData.append("memberId", memberId);
 				makeCall("POST", "removegroupmember", formData, req => {
 					if (req.readyState == 4) {
@@ -233,13 +407,10 @@
 					}
 				})
 			});
-			
+		}
+		
+		if (this.group.userId == loggedUser.id) {			
+			this.setupTrash();
 		}
 	}
-
-	let ownedGroupsManager = new GroupsManager("ownedactivegroups", document.getElementById("ownedActiveGroupsContainer"));
-	ownedGroupsManager.fetchAndDisplayGroups();
-	
-	let otherGroupsManager = new GroupsManager("activegroups", document.getElementById("otherActiveGroupsContainer"));
-	otherGroupsManager.fetchAndDisplayGroups();
 }

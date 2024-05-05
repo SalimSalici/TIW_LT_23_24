@@ -7,45 +7,46 @@
     <title>Work Groups - Home</title>
     <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
     <link rel="stylesheet" type="text/css" media="all" href="css/homeStyle.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="css/inviteUsersStyle.css" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-        
+
     <script src="js/utils.js"></script>
-	<script src="js/forms.js"></script>
-	
-	<style>
-		#popup-container {
-			position: fixed;
-			bottom: 20px;
-			right: 20px;
-			z-index: 1000;
-		}
+    <script src="js/forms.js"></script>
 
-		.popup-message {
-			color: white;
-			padding: 15px 30px;
-			margin-bottom: 10px;
-			border-radius: 5px;
-			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-			opacity: 0;
-			transition: opacity 0.5s;
-		}
+    <style>
+        #popup-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
 
-		.success {
-			background-color: #28a745;
-			/* Green */
-		}
+        .popup-message {
+            color: white;
+            padding: 15px 30px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
 
-		.error {
-			background-color: #dc3545;
-			/* Red */
-		}
+        .success {
+            background-color: #28a745;
+            /* Green */
+        }
 
-		.info {
-			background-color: #17a2b8;
-			/* Blue */
-		}
-	</style>
+        .error {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        .info {
+            background-color: #17a2b8;
+            /* Blue */
+        }
+    </style>
 </head>
 
 <body>
@@ -75,11 +76,10 @@
             Welcome <span id="welcomeNameText">[name]</span>
         </h1>
 
-        <!-- <form action="#" method="GET">
-            <div class="error-box" th:if="${session.createGroupValidation != null}">
-                <ul th:remove="all-but-first">
-                    <li th:each="errorMessage : ${session.createGroupValidation.errorMessages}"
-                        th:text="${errorMessage}">Error message 0</li>
+        <form id="createGroupForm" action="creategroup" method="POST">
+            <div class="error-box">
+                <ul>
+                    <li>Error message 0</li>
                     <li>Error message 1</li>
                     <li>Error message 2</li>
                 </ul>
@@ -87,31 +87,63 @@
             <div class="form-row">
                 <div class="input-field group-name">
                     <label for="groupName">Group Name:</label>
-                    <input type="text" id="groupName" name="groupName" required
-                        th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.name} : ''">
+                    <input type="text" id="groupNameInput" name="groupName" required maxlength="45">
                 </div>
 
                 <div class="input-field">
                     <label for="duration">Duration (in days):</label>
-                    <input type="number" id="duration" name="duration" min="1" required
-                        th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.duration} : ''">
+                    <input type="number" id="durationInput" name="duration" min="1" required min="1">
                 </div>
 
                 <div class="input-field">
                     <label for="minMembers">Minimum Members:</label>
-                    <input type="number" id="minMembers" name="minMembers" min="1" required
-                        th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.minUsers} : ''">
+                    <input type="number" id="minMembersInput" name="minMembers" min="1" required>
                 </div>
 
                 <div class="input-field">
                     <label for="maxMembers">Maximum Members:</label>
-                    <input type="number" id="maxMembers" name="maxMembers" min="1" required
-                        th:value="${session.createGroupValidation != null} ? ${session.createGroupValidation.maxUsers} : ''">
+                    <input type="number" id="maxMembersInput" name="maxMembers" min="1" required>
                 </div>
             </div>
 
-            <input type="submit" value="Create group">
-        </form> -->
+            <div id="modalContainer" class="modal-hidden" style="display: none">
+            <!-- <div id="modalContainer"> -->
+                <div class="wrapper">
+                    <div class="member-selection-container">
+                        <h2 style="color: #009688">Select members to invite</h2>
+                        <div id="inviteMemberListContainer" class="user-checkbox-group">
+                            <div id="userCheckboxTemplate" class="user-checkbox" style="display: none;">
+                                <label class="user-checkbox-wrapper">
+                                    <input name="usersToInvite[]" type="checkbox" class="user-checkbox-input" />
+                                    <span class="user-checkbox-tile">
+                                        <span class="user-checkbox-icon">
+                                            <span class="material-symbols-outlined">
+                                                account_circle
+                                            </span>
+                                        </span>
+                                        <span class="user-checkbox-label">
+                                            <span data-templ="name">Name</span><br>
+                                            <span data-templ="surname">Surname</span>
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="modal-selection-footer">
+                            <span>Attempt: <span id="attemptText">1</span></span>
+                            <br>
+                            <button id="cancelGroupCreationBtn" class="cancel-button" type="button">
+                            	Cancel
+                            </button>
+                            <input id="confirmGroupCreationBtn" type="submit" value="Create group" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="goToUserSelectionBtn" type="button">Select users to invite</button>
+        </form>
 
         <br>
         <h2>Your active Groups:</h2>
@@ -120,14 +152,15 @@
                 <div class="group-details-preview">
                     <h3 data-templ="groupDetailsName">[Group Name]</h3>
                     <p>
-                        <img src="images/clock.png" alt="Duration"> Duration:&nbsp;<span data-templ="groupPreviewDuration">6</span>&nbsp;Days
+                        <img src="images/clock.png" alt="Duration"> Duration:&nbsp;<span
+                            data-templ="groupPreviewDuration">6</span>&nbsp;Days
                     </p>
                     <p>
                         <img src="images/group.png" alt="Members">
                         Members:&nbsp;
                         <span data-templ="groupPreviewMemberCount">5</span>
-						/
-						<span data-templ="groupPreviewMaxUsers">15</span>
+                        /
+                        <span data-templ="groupPreviewMaxUsers">15</span>
                     </p>
                 </div>
                 <div data-templ="groupDetailsContainer" class="group-details-container">
@@ -174,7 +207,8 @@
                     <h3>Members </h3>
                     <div class="users-trash-container no-trash">
                         <div class="users-container">
-                            <div data-templ="userTileTemplate" class="user-tile-container" draggable="true" style="display: none">
+                            <div data-templ="userTileTemplate" class="user-tile-container" draggable="true"
+                                style="display: none">
                                 <span class="user-box-tile">
                                     <span class="user-box-icon">
                                         <span class="material-symbols-outlined"> account_circle </span>
@@ -201,11 +235,11 @@
 
         <br>
         <h2>Other active groups you are part of:</h2>
-        <ul id="otherActiveGroupsContainer"  class="group-list">
-            
+        <ul id="otherActiveGroupsContainer" class="group-list">
+
         </ul>
     </div>
-    
+
     <div id="popup-container"></div>
 
     <script>
@@ -223,29 +257,29 @@
         }
 
     </script>
-    
+
     <script>
-		function createPopup(message, type, duration) {
-			const container = document.getElementById('popup-container');
-			const popup = document.createElement('div');
-			popup.className = `popup-message ${type}`;
-			popup.textContent = message;
+        function createPopup(message, type, duration) {
+            const container = document.getElementById('popup-container');
+            const popup = document.createElement('div');
+            popup.className = `popup-message ${type}`;
+            popup.textContent = message;
 
-			container.appendChild(popup);
+            container.appendChild(popup);
 
-			// Make the popup visible
-			setTimeout(() => {
-				popup.style.opacity = 1;
-			}, 100);
+            // Make the popup visible
+            setTimeout(() => {
+                popup.style.opacity = 1;
+            }, 100);
 
-			// Remove the popup after a user-defined duration
-			setTimeout(() => {
-				popup.style.opacity = 0;
-				setTimeout(() => container.removeChild(popup), 500);
-			}, duration);
-		}
-	</script>
-    
+            // Remove the popup after a user-defined duration
+            setTimeout(() => {
+                popup.style.opacity = 0;
+                setTimeout(() => container.removeChild(popup), 500);
+            }, duration);
+        }
+    </script>
+
     <script src="js/home.js"></script>
 
 </body>

@@ -119,7 +119,7 @@ public class UserDAO {
 	public List<Group> fetchGroupsWithUser(int userId) throws SQLException {
 		List<Group> groups = new LinkedList<>();
 		String query =
-				   "SELECT g.id, g.group_name, g.duration, g.min_users, g.max_users, g.created_at, u.user_count, ug.user_id "
+				   "SELECT g.id, g.group_name, g.duration, g.min_users, g.max_users, g.created_at, g.user_id, u.user_count "
 	             + "FROM `groups` g "
 	             + "JOIN ("
 	             		// This subquery is to extract the member count of each group
