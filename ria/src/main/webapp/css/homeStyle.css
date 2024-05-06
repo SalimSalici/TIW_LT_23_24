@@ -219,8 +219,3 @@ input[type=submit]:hover {
     border-color: #f00 !important;
 	background-color: #ffd5d5 !important;
 }
-
-button:disabled {
-	background-color: #8c9d9c !important;
-	cursor: wait !important;
-}

@@ -77,72 +77,73 @@
         </h1>
 
         <form id="createGroupForm" action="creategroup" method="POST">
-            <div class="error-box">
-                <ul>
-                    <li>Error message 0</li>
-                    <li>Error message 1</li>
-                    <li>Error message 2</li>
-                </ul>
-            </div>
-            <div class="form-row">
-                <div class="input-field group-name">
-                    <label for="groupName">Group Name:</label>
-                    <input type="text" id="groupNameInput" name="groupName" required maxlength="45">
+            <fieldset id="createGroupFieldset">
+                <div class="error-box">
+                    <ul id="createGroupErrorList">
+                    </ul>
+                </div>
+                <div class="form-row">
+                    <div class="input-field group-name">
+                        <label for="groupName">Group Name:</label>
+                        <input type="text" id="groupNameInput" name="groupName" required maxlength="45">
+                    </div>
+
+                    <div class="input-field">
+                        <label for="duration">Duration (in days):</label>
+                        <input type="number" id="durationInput" name="duration" min="1" required min="1">
+                    </div>
+
+                    <div class="input-field">
+                        <label for="minMembers">Minimum Members:</label>
+                        <input type="number" id="minMembersInput" name="minMembers" min="1" required>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="maxMembers">Maximum Members:</label>
+                        <input type="number" id="maxMembersInput" name="maxMembers" min="1" required>
+                    </div>
                 </div>
 
-                <div class="input-field">
-                    <label for="duration">Duration (in days):</label>
-                    <input type="number" id="durationInput" name="duration" min="1" required min="1">
-                </div>
-
-                <div class="input-field">
-                    <label for="minMembers">Minimum Members:</label>
-                    <input type="number" id="minMembersInput" name="minMembers" min="1" required>
-                </div>
-
-                <div class="input-field">
-                    <label for="maxMembers">Maximum Members:</label>
-                    <input type="number" id="maxMembersInput" name="maxMembers" min="1" required>
-                </div>
-            </div>
-
-            <div id="modalContainer" class="modal-hidden" style="display: none">
-            <!-- <div id="modalContainer"> -->
-                <div class="wrapper">
-                    <div class="member-selection-container">
-                        <h2 style="color: #009688">Select members to invite</h2>
-                        <div id="inviteMemberListContainer" class="user-checkbox-group">
-                            <div id="userCheckboxTemplate" class="user-checkbox" style="display: none;">
-                                <label class="user-checkbox-wrapper">
-                                    <input name="usersToInvite[]" type="checkbox" class="user-checkbox-input" />
-                                    <span class="user-checkbox-tile">
-                                        <span class="user-checkbox-icon">
-                                            <span class="material-symbols-outlined">
-                                                account_circle
+                <div id="modalContainer" class="modal-hidden" style="display: none">
+                    <!-- <div id="modalContainer"> -->
+                    <div class="wrapper">
+                        <div class="member-selection-container">
+                            <h2 style="color: #009688">Select members to invite</h2>
+                            <div id="inviteMemberListContainer" class="user-checkbox-group">
+                                
+                                <div id="userCheckboxTemplate" class="user-checkbox" style="display: none;">
+                                    <label class="user-checkbox-wrapper">
+                                        <input name="usersToInvite[]" type="checkbox" class="user-checkbox-input" />
+                                        <span class="user-checkbox-tile">
+                                            <span class="user-checkbox-icon">
+                                                <span class="material-symbols-outlined">
+                                                    account_circle
+                                                </span>
+                                            </span>
+                                            <span class="user-checkbox-label">
+                                                <span data-templ="name">Name</span><br>
+                                                <span data-templ="surname">Surname</span>
                                             </span>
                                         </span>
-                                        <span class="user-checkbox-label">
-                                            <span data-templ="name">Name</span><br>
-                                            <span data-templ="surname">Surname</span>
-                                        </span>
-                                    </span>
-                                </label>
+                                    </label>
+                                </div>
+                                
                             </div>
-                        </div>
-                        <br>
-                        <div class="modal-selection-footer">
-                            <span>Attempt: <span id="attemptText">1</span></span>
                             <br>
-                            <button id="cancelGroupCreationBtn" class="cancel-button" type="button">
-                            	Cancel
-                            </button>
-                            <input id="confirmGroupCreationBtn" type="submit" value="Create group" />
+                            <div class="modal-selection-footer">
+                                <span>Attempt: <span id="attemptText">1</span></span>
+                                <br>
+                                <button id="cancelGroupCreationBtn" class="cancel-button" type="button">
+                                    Cancel
+                                </button>
+                                <input id="confirmGroupCreationBtn" type="submit" value="Create group" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <button id="goToUserSelectionBtn" type="button">Select users to invite</button>
+                <button id="goToUserSelectionBtn" type="button">Select users to invite</button>
+            </fieldset>
         </form>
 
         <br>

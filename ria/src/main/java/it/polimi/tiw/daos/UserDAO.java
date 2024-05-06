@@ -40,7 +40,7 @@ public class UserDAO {
 	}
 
 	public User login(String username, String password) throws SQLException {
-		String query = "SELECT  id, username, email, name, surname FROM users WHERE username = ? AND password = ?";
+		String query = "SELECT  id, username, email, name, surname FROM users WHERE username = ? AND BINARY password = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, username);
 			pstatement.setString(2, password);

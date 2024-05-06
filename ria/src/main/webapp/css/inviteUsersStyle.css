@@ -161,6 +161,11 @@ input[type="submit"]:hover {
 	background-color: rgb(255, 25, 25);
 }
 
+button:disabled, input[type="submit"]:disabled {
+	background-color: #8c9d9c !important;
+	cursor: wait !important;
+}
+
 #modalContainer {
 	position: fixed;
 	top: 0;

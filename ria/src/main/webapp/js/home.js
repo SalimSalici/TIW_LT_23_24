@@ -1,4 +1,7 @@
 {
+
+	// TODO: Disable inputs when waiting for server response
+
 	if (sessionStorage.getItem("user") == null)
 		logout();
 
@@ -17,19 +20,22 @@
 
 	const loggedUser = JSON.parse(sessionStorage.getItem("user"));
 	document.getElementById("welcomeNameText").innerText = loggedUser.username;
-	
+
 	let ownedGroupsManager = new GroupsManager("ownedactivegroups", document.getElementById("ownedActiveGroupsContainer"));
 	ownedGroupsManager.fetchAndDisplayGroups();
 
 	let otherGroupsManager = new GroupsManager("activegroups", document.getElementById("otherActiveGroupsContainer"));
 	otherGroupsManager.fetchAndDisplayGroups();
-	
+
 	let createGroupManager = new CreateGroupManager();
 
 	function CreateGroupManager() {
 		let self = this;
 
 		this.form = document.getElementById("createGroupForm");
+		this.createGroupFieldset = document.getElementById("createGroupFieldset");
+		this.errorBoxContainer = this.form.querySelector(".error-box");
+		this.createGroupErrorList = document.getElementById("createGroupErrorList");
 		this.groupNameInput = document.getElementById("groupNameInput");
 		this.durationInput = document.getElementById("durationInput");
 		this.minMembersInput = document.getElementById("minMembersInput");
@@ -39,7 +45,7 @@
 		this.modalContainer = document.getElementById("modalContainer");
 		this.attemptText = document.getElementById("attemptText");
 		this.inviteMemberListContainer = document.getElementById("inviteMemberListContainer");
-		
+
 		this.userCheckboxTemplate = document.getElementById("userCheckboxTemplate");
 
 		this.attempt = 1;
@@ -51,8 +57,15 @@
 			evt.stopImmediatePropagation();
 			evt.stopPropagation();
 
+			self.hideErrors();
+
 			if (self.form.checkValidity()) {
-				
+				if (parseInt(self.minMembersInput.value) > parseInt(self.maxMembersInput.value)) {
+					createPopup("Minimum members must be less than or equal to the maximum members", "error", 5000);
+					return;
+				}
+
+				self.createGroupFieldset.setAttribute("disabled", "true");
 				makeCall("GET", "users", null, (req) => {
 					if (req.readyState === 4) {
 						switch (req.status) {
@@ -66,9 +79,10 @@
 								break;
 							default:
 								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
-									req.responseText : "Error fetching all users";
+									req.responseText : "Error fetching all users.";
 								createPopup(errorMsg, "error", 5000);
 						}
+						self.createGroupFieldset.removeAttribute("disabled");
 					}
 				});
 
@@ -82,7 +96,7 @@
 			evt.preventDefault();
 			evt.stopImmediatePropagation();
 			evt.stopPropagation();
-			
+
 			if (self.form.checkValidity()) {
 				let formData = new FormData(self.form);
 				let usersCount = formData.getAll("usersToInvite[]").length;
@@ -96,21 +110,22 @@
 					errorMessage = "Too many users selected. Deselect at least " + excess + " user(s).";
 				}
 
-				if (usersCount < self.minMembersInput.value || usersCount > self.maxMembersInput.value) {
+				if (errorMessage != null) {
 					self.attempt++;
 					self.attemptText.innerText = self.attempt;
-					
+
 					if (self.attempt <= 3) {
-						createPopup(errorMessage, "error", 5000);	
+						createPopup(errorMessage, "error", 5000);
 					} else {
 						self.form.reset();
 						self.closeModal();
 						createPopup("Group creation cancelled because you exceeded 3 attempts. Please start over.", "error", 5000);
 					}
-					
+
 					return;
 				}
 
+				self.createGroupFieldset.setAttribute("disabled", "true");
 				makeCall("POST", "creategroup", formData, req => {
 					if (req.readyState == 4) {
 						switch (req.status) {
@@ -121,15 +136,20 @@
 								self.closeModal();
 								createPopup("Group created successfully.", "success", 5000);
 								break;
+							case 400:
+								self.displayErrors(JSON.parse(req.responseText));
+								self.closeModal();
+								break;
 							case 403:
 								window.location.href = req.getResponseHeader("Location");
 								window.sessionStorage.removeItem("user");
 								break;
 							default:
 								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
-									req.responseText : "Error fetching all users";
+									req.responseText : "Error creating group.";
 								createPopup(errorMsg, "error", 5000);
 						}
+						self.createGroupFieldset.removeAttribute("disabled");
 					}
 				})
 
@@ -139,7 +159,7 @@
 				createPopup("Please fill in all fields correctly", "error", 5000);
 			}
 		})
-		
+
 		this.cancelGroupCreationBtn.addEventListener("click", evt => {
 			self.form.reset();
 			self.closeModal();
@@ -169,11 +189,26 @@
 			self.openModal();
 		}
 
+		this.displayErrors = function (errors) {
+			self.createGroupErrorList.innerHTML = "";
+			for (let i = 0; i < errors.length; i++) {
+				let error = errors[i];
+				let errorLi = document.createElement("li");
+				errorLi.innerText = error;
+				self.createGroupErrorList.appendChild(errorLi);
+			}
+			self.errorBoxContainer.style.display = "block";
+		}
+
+		this.hideErrors = function () {
+			self.errorBoxContainer.style.display = "none";
+		}
+
 		this.openModal = function () {
 			this.modalContainer.style.display = "block";
 			setTimeout(() => {
 				this.modalContainer.classList.remove("modal-hidden");
-			}, 100);
+			}, 50);
 		}
 
 		this.closeModal = function () {
@@ -183,8 +218,6 @@
 			}, 300);
 		}
 	}
-
-	asd = new CreateGroupManager();
 
 	function GroupsManager(_url, _containerEl) {
 		let self = this;
@@ -215,6 +248,7 @@
 		}
 
 		this.displayGroups = function () {
+			this.containerEl.innerHTML = "";
 			for (let i = 0; i < this.groups.length; i++) {
 				let group = this.groups[i];
 
@@ -239,7 +273,20 @@
 
 				let groupDetails = new GroupDetails(group, groupContainer, groupDetailsContainer, toggleDetailsBtn);
 
+				group["containerEl"] = groupContainer;
+				group["groupDetails"] = groupDetails;
+
 				this.containerEl.appendChild(groupContainer);
+			}
+		}
+
+		this.removeMemberFromGroup = function (groupId, memberId) {
+			for (let i = 0; i < this.groups.length; i++) {
+				if (this.groups[i].id == groupId) {
+					let group = this.groups[i];
+					group.groupDetails.removeUser(memberId);
+					return;
+				}
 			}
 		}
 	}
@@ -252,6 +299,8 @@
 		this.groupEl = _groupEl;
 		this.groupDetailsContainer = _groupDetailsContainer;
 		this.toggleBtnEl = _toggleBtnEl;
+
+		this.groupPreviewMemberCount = this.groupEl.querySelector("[data-templ=groupPreviewMemberCount]");
 
 		this.groupInfoName = this.groupDetailsContainer.querySelector("[data-templ=groupInfoName]");
 		this.groupInfoOwnerName = this.groupDetailsContainer.querySelector("[data-templ=groupInfoOwnerName]");
@@ -272,6 +321,8 @@
 
 		this.dragged = null;
 
+		this.users = [];
+
 		this.toggleBtnEl.addEventListener("click", evt => {
 			if (self.groupEl.classList.contains("group-expanded")) { // close group details
 				self.groupEl.classList.remove("group-expanded");
@@ -291,7 +342,8 @@
 						case 200:
 							let json = JSON.parse(req.responseText);
 							self.toggleBtnEl.innerText = "Hide details";
-							self.expand(json.group, json.users);
+							self.users = json.users;
+							self.expand(json.group);
 							break;
 						case 403:
 							window.location.href = req.getResponseHeader("Location");
@@ -305,7 +357,7 @@
 			});
 		}
 
-		this.expand = function (group, users) {
+		this.expand = function (group) {
 
 			// Group info
 			this.groupInfoName.innerText = group.groupName;
@@ -320,12 +372,13 @@
 			this.groupInfoMaxMembers.innerText = group.maxUsers;
 
 			// Member list
-			for (let i = 0; i < users.length; i++) {
-				let user = users[i];
+			for (let i = 0; i < self.users.length; i++) {
+				let user = self.users[i];
 				let userTile = this.userTileTemplate.cloneNode(true);
 				userTile.removeAttribute("id");
 				userTile.removeAttribute("style");
 				userTile.setAttribute("data-memberid", user.id);
+				user["userTile"] = userTile;
 
 				let groupMemberUsername = userTile.querySelector("[data-templ=groupMemberUsername]");
 				groupMemberUsername.innerText = user.username;
@@ -337,16 +390,16 @@
 				groupMemberSurname.innerText = user.surname;
 
 				let userBoxTile = userTile.querySelector(".user-box-tile");
-				
+
 				if (self.group.userId == loggedUser.id) {
 					userTile.addEventListener('dragstart', evt => {
 						userBoxTile.classList.add("dragging");
 						self.dragged = evt.target;
 					});
-	
+
 					userTile.addEventListener('dragend', evt => {
 						userBoxTile.classList.remove("dragging");
-					});	
+					});
 				} else {
 					userTile.removeAttribute("draggable");
 				}
@@ -366,7 +419,7 @@
 			});
 
 			this.trashBtn.addEventListener("drop", evt => {
-				
+
 				if (self.dragged === null) {
 					createPopup("Please, drop a valid user of this group.", "error", 5000);
 					return;
@@ -388,9 +441,12 @@
 						switch (req.status) {
 							case 200:
 								createPopup("User removed from group successfully.", "success", "5000");
-								self.dragged.parentElement.removeChild(self.dragged);
-								self.group.userCount--;
-								self.groupInfoMemeberCount.innerText = self.group.userCount;
+								// self.dragged.parentElement.removeChild(self.dragged);
+								// self.group.userCount--;
+								// self.groupInfoMemeberCount.innerText = self.group.userCount;
+								// self.removeUser(memberId);
+								otherGroupsManager.removeMemberFromGroup(self.group.id, memberId);
+								ownedGroupsManager.removeMemberFromGroup(self.group.id, memberId);
 								break;
 							case 409:
 								createPopup("Group cannot have less than the current amount of members.", "error", 5000);
@@ -401,15 +457,30 @@
 								break;
 							default:
 								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
-									req.responseText : "Error removing user from group";
+									req.responseText : "Error removing user from group.";
 								createPopup(errorMsg, "error", 5000);
 						}
 					}
 				})
 			});
 		}
-		
-		if (this.group.userId == loggedUser.id) {			
+
+		this.removeUser = function (userId) {
+			self.group.userCount--;
+			self.groupInfoMemeberCount.innerText = self.group.userCount;
+			self.groupPreviewMemberCount.innerText = self.group.userCount;
+			for (let i = 0; i < self.users.length; i++) {
+				if (self.users[i].id == userId) {
+					let user = self.users[i];
+					self.users.splice(i, 1);
+					if (self.usersContainer.contains(user.userTile))
+						self.usersContainer.removeChild(user.userTile);
+					return;
+				}
+			}
+		}
+
+		if (this.group.userId == loggedUser.id) {
 			this.setupTrash();
 		}
 	}

@@ -77,7 +77,7 @@ public class CreateGroup extends HttpServlet {
 			return;
 		}
 		
-		List<String> errors = this.validateInputs(groupName, duration, minMembers, maxMembers);
+		List<String> errors = this.validateInputs(groupName, duration, minMembers, maxMembers, inviteCount);
 		
 		GroupDAO gDAO = new GroupDAO(this.connection);
 		User user = (User)request.getSession().getAttribute("user");
@@ -90,13 +90,7 @@ public class CreateGroup extends HttpServlet {
 			return;
 		}
 		
-		int shortage = minMembers - inviteCount;
-		int excess = inviteCount - maxMembers;
-		if (shortage > 0) {
-			errors.add("Not enough users selected. Select at least " + shortage + " more.");
-		} else if (excess > 0) {
-			errors.add("Too many users selected. Deselect at least " + excess + " user(s).");
-		}
+		
 		
 		if (!errors.isEmpty()) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -117,7 +111,7 @@ public class CreateGroup extends HttpServlet {
 		response.getWriter().append("Group created");
 	}
 	
-	private List<String> validateInputs(String groupName, int duration, int minMembers, int maxMembers) {
+	private List<String> validateInputs(String groupName, int duration, int minMembers, int maxMembers, int inviteCount) {
 		List<String> errors = new LinkedList<>();
 		
 		if (groupName.length() < 1 || groupName.length() > 45)
@@ -127,8 +121,18 @@ public class CreateGroup extends HttpServlet {
 			errors.add("Minimum amount of members must be at least 1.");
 		if (maxMembers < 1)
 			errors.add("Maxmum amount of members must be at least 1.");
+		
 		if (maxMembers < minMembers)
 			errors.add("Maximum amount of members cannot be less than minimum amount of members.");
+		else {
+			int shortage = minMembers - inviteCount;
+			int excess = inviteCount - maxMembers;
+			
+			if (shortage > 0)
+				errors.add("Not enough users selected. Select at least " + shortage + " more.");
+			else if (excess > 0)
+				errors.add("Too many users selected. Deselect at least " + excess + " user(s).");
+		}		 
 		
 		return errors;
 	}
