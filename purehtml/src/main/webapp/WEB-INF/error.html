@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Work Groups - Cancellation</title>
+	<link rel="stylesheet" type="text/css" media="all" href="../css/style.css" th:href="@{/css/style.css}" />
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+	<header th:replace="@{thfragments/header} :: header"></header>
+
+	<div class="wrapper">
+		<div class="error-box" style="margin-top: 150px">
+		<h1>Error <span th:text="${statusCode}">000</span></h1>
+		<p th:text="${errorMessage}">Error message</p>
+		<p>Click <a th:href="@{/home}" href="#">here</a> to go to the home page.</p>
+		</div>
+	</div>
+</body>
+
+</html>

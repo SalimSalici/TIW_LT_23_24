@@ -15,28 +15,30 @@ import org.thymeleaf.context.WebContext;
 import it.polimi.tiw.utils.ThymeleafInitializer;
 
 /**
- * Servlet implementation class Cancellation
+ * Servlet implementation class Cancellation that displays the cancellation page (after a user's third try of creating a group).
  */
 @WebServlet("/cancellation")
 public class Cancellation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Cancellation() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+	/**
+	 * Initializes the servlet with necessary components like TemplateEngine.
+	 * @throws ServletException if an error occurs during initialization.
+	 */
+	@Override
     public void init() {
     	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());
     }
-
+	
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles GET requests to the servlet.
+	 * @param request The HTTP request object.
+	 * @param response The HTTP response object.
+	 * @throws ServletException if an error occurs during processing.
+	 * @throws IOException if an error occurs during processing.
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String path = "cancellation";
 		ServletContext servletContext = getServletContext();
@@ -45,10 +47,14 @@ public class Cancellation extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Handles POST requests to the servlet.
+	 * @param request The HTTP request object.
+	 * @param response The HTTP response object.
+	 * @throws ServletException if an error occurs during processing.
+	 * @throws IOException if an error occurs during processing.
 	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet Filter implementation class AuthValidationCleanupFilter
  */
-@WebFilter({"/auth", "/home"})
+@WebFilter({"/home"})
 public class ValidationCleanupFilter extends HttpFilter implements Filter {
 
 	private static final long serialVersionUID = 1L;
@@ -47,8 +47,6 @@ public class ValidationCleanupFilter extends HttpFilter implements Filter {
 			HttpServletRequest req = (HttpServletRequest) request;
 			HttpSession session = req.getSession(false); // Get the session if it exists, do not create if it doesn't
 			if (session != null) {
-				session.removeAttribute("loginErrorMessage");
-				session.removeAttribute("registerValidation");
 				session.removeAttribute("createGroupValidation");
 			}
 		}

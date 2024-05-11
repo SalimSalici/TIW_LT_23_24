@@ -30,23 +30,14 @@ public class GroupDetails extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public GroupDetails() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    
+
+	@Override
     public void init() throws UnavailableException {
     	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());    
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int groupId = Integer.parseInt(request.getParameter("id"));
 		GroupDAO gDAO = new GroupDAO(this.connection);
@@ -58,8 +49,7 @@ public class GroupDetails extends HttpServlet {
 			users = gDAO.fetchUsersOfGroup(groupId);
 			group.setUserCount(users.size());
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, e.getMessage());
-//			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
 		
@@ -72,9 +62,7 @@ public class GroupDetails extends HttpServlet {
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);

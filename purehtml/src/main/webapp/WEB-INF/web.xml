@@ -18,8 +18,10 @@
 		<param-name>dbDriver</param-name>
 		<param-value>com.mysql.cj.jdbc.Driver</param-value>
 	</context-param>
-	<servlet>
-		<servlet-name>TestServlet</servlet-name>
-		<servlet-class>it.polimi.tiw.test.TestServlet</servlet-class>
-	</servlet>
+	<welcome-file-list>
+		<welcome-file>home</welcome-file>
+	</welcome-file-list>
+	<error-page>
+        <location>/error</location>
+    </error-page>
 </web-app>

@@ -30,23 +30,14 @@ public class Home extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Home() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+    @Override
     public void init() throws UnavailableException {
     	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		User user = (User)request.getSession().getAttribute("user");
 		
