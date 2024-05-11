@@ -23,7 +23,7 @@ import it.polimi.tiw.utils.DatabaseInitializer;
 import it.polimi.tiw.utils.ThymeleafInitializer;
 
 /**
- * Servlet implementation class Home
+ * Servlet implementation class Home that handles the main page display after user login.
  */
 @WebServlet("/home")
 public class Home extends HttpServlet {
@@ -31,42 +31,61 @@ public class Home extends HttpServlet {
 	private TemplateEngine templateEngine;
 	private Connection connection;
     
+    /**
+     * Initializes the servlet by setting up the template engine and database connection.
+     * @throws UnavailableException if initialization fails
+     */
     @Override
     public void init() throws UnavailableException {
     	this.templateEngine = ThymeleafInitializer.initialize(this.getServletContext());
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
+    /**
+     * Handles the GET request by fetching user-specific data and rendering the home page.
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Retrieve user from session
 		User user = (User)request.getSession().getAttribute("user");
 		
+		// DAO for accessing user data
 		UserDAO uDAO = new UserDAO(this.connection);
 		List<Group> ownedGroups;
 		List<Group> otherGroups;
 		try {
+			// Fetch groups owned by the user and groups the user is part of
 			ownedGroups = uDAO.fetchGroupsOwnedBy(user.getId());
 			otherGroups = uDAO.fetchGroupsWithUser(user.getId());
 		} catch (SQLException e) {
+			// Handle SQL exceptions by sending a server error response
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
 		
+		// Define the path for the Thymeleaf template
 		String path = "home";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		ctx.setVariable("ownedGroups", ownedGroups);
 		ctx.setVariable("otherGroups", otherGroups);
 		
+		// Process the template to render the page
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Closes the database connection when the servlet is destroyed.
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 }

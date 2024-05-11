@@ -6,6 +6,10 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+/**
+ * This class is used to initialize Thymeleaf.
+ * It sets the template mode, the template resolver, and the template engine.
+ */
 public abstract class ThymeleafInitializer {
 	public static TemplateEngine initialize(ServletContext servletContext) {
 		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
@@ -16,8 +20,7 @@ public abstract class ThymeleafInitializer {
 		templateResolver.setCharacterEncoding("UTF-8");
 		templateResolver.setPrefix("WEB-INF/");
 		templateResolver.setSuffix(".html");
-		// TODO: remove this
-		templateResolver.setCacheable(false);
+		templateResolver.setCacheable(false); // TODO: remove this
 		return templateEngine;
 	}
 }

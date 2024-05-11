@@ -12,13 +12,26 @@ import java.util.List;
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
 
+/**
+ * Group DAO
+ */
 public class GroupDAO {
 	private Connection connection;
 
+	/**
+	 * Constructs a new GroupDAO with the given database connection.
+	 * @param connection The database connection to be used by this DAO.
+	 */
 	public GroupDAO(Connection connection) {
 		this.connection = connection;
 	}
 	
+	/**
+	 * Fetches a Group from the database by its ID.
+	 * @param groupId The ID of the Group to fetch.
+	 * @return The Group if found, or null if not found.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public Group fetchGroupById(int groupId) throws SQLException {
 		String query = 
 				  "SELECT `groups`.id AS group_id, group_name, user_id, duration, min_users, max_users, `groups`.created_at, "
@@ -60,6 +73,12 @@ public class GroupDAO {
 		}
 	}
 	
+	/**
+	 * Fetches a list of User that are members of a Group.
+	 * @param groupId The ID of the Group to fetch the users for.
+	 * @return A list of Users that are members of the Group.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public List<User> fetchUsersOfGroup(int groupId) throws SQLException {
 		List<User> users = new LinkedList<>();
 		String query = "SELECT `users`.id, `users`.username, email, `users`.name, `users`.surname FROM users "
@@ -84,6 +103,13 @@ public class GroupDAO {
 		return users;
 	}
 
+	/**
+	 * Checks if a Group name is available for a User.
+	 * @param user_id The ID of the User to check for.
+	 * @param name The name of the Group to check for.
+	 * @return true if the Group name is available, false if it is not.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public boolean isGroupNameAvailableForUser(int user_id, String name) throws SQLException {
 		String query = "SELECT * FROM `groups` WHERE user_id = ? AND group_name = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
@@ -98,6 +124,16 @@ public class GroupDAO {
 		}
 	}
 
+	/**
+	 * Creates a new Group in the database.
+	 * @param name The name of the new Group.
+	 * @param creator_id The ID of the User who is creating the Group.
+	 * @param duration The duration of the Group.
+	 * @param minUsers The minimum number of users in the Group.
+	 * @param maxUsers The maximum number of users in the Group.
+	 * @param userIds The IDs of the Users to invite to the Group.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public void createNewGroup(String name, int creator_id, int duration, int minUsers, int maxUsers, int[] userIds)
 			throws SQLException {
 
@@ -144,3 +180,4 @@ public class GroupDAO {
 
 	}
 }
+

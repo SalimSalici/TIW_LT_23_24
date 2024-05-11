@@ -234,4 +234,15 @@ public class Auth extends HttpServlet {
 		return Pattern.compile(emailPattern).matcher(email).matches();
 	}
 
+	/**
+	 * Closes the database connection when the servlet is destroyed.
+	 */
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
+
 }

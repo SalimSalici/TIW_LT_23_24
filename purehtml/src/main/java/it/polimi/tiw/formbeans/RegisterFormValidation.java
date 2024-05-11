@@ -1,5 +1,10 @@
 package it.polimi.tiw.formbeans;
 
+/**
+ * This class is used to validate the form for registering a new user.
+ * It checks the username, name, surname, and email.
+ * If any of the parameters are invalid, an error message is added to the list of error messages.
+ */
 public class RegisterFormValidation {
 	private String username;
 	private String name;

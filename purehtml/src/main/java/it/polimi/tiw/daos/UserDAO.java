@@ -11,13 +11,25 @@ import java.util.List;
 import it.polimi.tiw.beans.Group;
 import it.polimi.tiw.beans.User;
 
+/**
+ * User DAO
+ */
 public class UserDAO {
 	private Connection connection;
 
+	/**
+	 * Constructs a new UserDAO with the given database connection.
+	 * @param connection The database connection to be used by this DAO.
+	 */
 	public UserDAO(Connection connection) {
 		this.connection = connection;
 	}
 	
+	/**
+	 * Fetches all users from the database.
+	 * @return A list of all users in the database.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public List<User> fetchAllUsers() throws SQLException {
 		List<User> users = new LinkedList<>();
 		String query = "SELECT  id, username, email, name, surname FROM users ORDER BY surname ASC";
@@ -39,6 +51,13 @@ public class UserDAO {
 		return users;
 	}
 
+	/**
+	 * Logs a user into the system.
+	 * @param username The username of the user.
+	 * @param password The password of the user.
+	 * @return The user if the login is successful, or null if it is not.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public User login(String username, String password) throws SQLException {
 		String query = "SELECT  id, username, email, name, surname FROM users WHERE username = ? AND password = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
@@ -61,6 +80,12 @@ public class UserDAO {
 		}
 	}
 	
+	/**
+	 * Checks if a username is available.
+	 * @param username The username to check.
+	 * @return true if the username is available, false if it is not.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public boolean isUsernameAvailable(String username) throws SQLException {
 		String query = "SELECT id FROM users WHERE username = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
@@ -75,6 +100,15 @@ public class UserDAO {
 		}
 	}
 
+	/**
+	 * Registers a new user in the system.
+	 * @param username The username of the new user.
+	 * @param email The email of the new user.
+	 * @param password The password of the new user.
+	 * @param name The name of the new user.
+	 * @param surname The surname of the new user.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public void register(String username, String email, String password, String name, String surname) throws SQLException {
 		String query = "INSERT INTO users(username, email, password, name, surname) VALUES (?, ?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
@@ -87,6 +121,12 @@ public class UserDAO {
 		}
 	}
 	
+	/**
+	 * Fetches all groups owned by a user.
+	 * @param userId The ID of the user.
+	 * @return A list of all groups owned by the user.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public List<Group> fetchGroupsOwnedBy(int userId) throws SQLException {
 		List<Group> groups = new LinkedList<>();
 		String query = "SELECT id, group_name, `groups`.user_id, duration, min_users, max_users, created_at, COUNT(user_groups.group_id) AS user_count "
@@ -116,6 +156,12 @@ public class UserDAO {
 		return groups;
 	}
 	
+	/**
+	 * Fetches all groups with a given user as a member.
+	 * @param userId The ID of the user.
+	 * @return A list of all groups with the user as a member.
+	 * @throws SQLException if a database error occurs.
+	 */
 	public List<Group> fetchGroupsWithUser(int userId) throws SQLException {
 		List<Group> groups = new LinkedList<>();
 		String query =
@@ -150,7 +196,5 @@ public class UserDAO {
 			}
 		}
 		return groups;
-	}
-	
-	
+	}	
 }

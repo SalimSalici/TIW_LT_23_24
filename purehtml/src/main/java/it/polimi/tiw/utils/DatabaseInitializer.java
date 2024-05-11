@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import javax.servlet.ServletContext;
 import javax.servlet.UnavailableException;
 
+/**
+ * This class is used to initialize the database connection.
+ * It loads the database driver and connects to the database.
+ */
 public abstract class DatabaseInitializer {
 	public static Connection initialize(ServletContext context) throws UnavailableException {
 		Connection connection;

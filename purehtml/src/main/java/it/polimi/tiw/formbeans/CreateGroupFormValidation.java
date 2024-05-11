@@ -3,6 +3,11 @@ package it.polimi.tiw.formbeans;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class is used to validate the form for creating a new group.
+ * It checks the name, duration, and number of users in the group.
+ * If any of the parameters are invalid, an error message is added to the list of error messages.
+ */
 public class CreateGroupFormValidation {
 	private String name;
 	private int duration;

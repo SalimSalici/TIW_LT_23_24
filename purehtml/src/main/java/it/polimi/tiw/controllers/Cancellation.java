@@ -45,17 +45,4 @@ public class Cancellation extends HttpServlet {
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		templateEngine.process(path, ctx, response.getWriter());
 	}
-
-	/**
-	 * Handles POST requests to the servlet.
-	 * @param request The HTTP request object.
-	 * @param response The HTTP response object.
-	 * @throws ServletException if an error occurs during processing.
-	 * @throws IOException if an error occurs during processing.
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
-	}
-
 }

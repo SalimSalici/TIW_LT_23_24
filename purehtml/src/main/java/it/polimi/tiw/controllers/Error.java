@@ -40,12 +40,7 @@ public class Error extends HttpServlet {
 	 * @throws IOException if an error occurs during processing.
 	 */
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		String path = "error";
-//		ServletContext servletContext = getServletContext();
-//		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-//		templateEngine.process(path, ctx, response.getWriter());
-		
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		// Retrieve error code and message set by sendError()
 	    Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
 	    String errorMessage = (String) request.getAttribute("javax.servlet.error.message");
@@ -65,15 +60,4 @@ public class Error extends HttpServlet {
 	    String path = "error";
 	    templateEngine.process(path, ctx, response.getWriter());
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-
 }
