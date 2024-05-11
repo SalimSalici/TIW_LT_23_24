@@ -3,23 +3,31 @@ function FormTextInput(_textInputEl, _errorBoxEl, _validationCheck) {
     this.errorBoxEl = _errorBoxEl;
     this.validationCheck = _validationCheck;
 
-    this.validate = function() {
+    this.isValid = function() {
         let validation = this.validationCheck(this.textInputEl.value);
         if (validation.hasError) {
-            this.errorBoxEl.innerText = validation.errorMessage;
-            this.errorBoxEl.style.display = "block";
+			this.displayError(validation.errorMessage);
+            return false;
         } else {
-            this.errorBoxEl.style.display = "none";
+            this.hideError();
+            return true;
         }
     }
 
     this.textInputEl.addEventListener("blur", (evt) => {
-        if (this.textInputEl.value.length > 0)
-            this.validate();
+        this.hideError();
     });
     
     this.displayError = function(msg) {
 		this.errorBoxEl.innerText = msg;
         this.errorBoxEl.style.display = "block";
+	}
+	
+	this.hideError = function(msg) {
+		this.errorBoxEl.style.display = "none";
+	}
+	
+	this.getValue = function() {
+		return this.textInputEl.value;
 	}
 }

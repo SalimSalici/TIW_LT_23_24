@@ -41,39 +41,55 @@
         username: new FormTextInput(
             document.getElementById("registerUsername"),
             document.getElementById("registerUsernameErrorBox"),
-            value => { return { hasError: false } }
+            _ => { return { hasError: false } }
         ),
         name: new FormTextInput(
             document.getElementById("registerName"),
             document.getElementById("registerNameErrorBox"),
-            value => { return { hasError: false } }
+            _ => { return { hasError: false } }
         ),
         surname: new FormTextInput(
             document.getElementById("registerSurname"),
             document.getElementById("registerSurnameErrorBox"),
-            value => { return { hasError: false } }
+            _ => { return { hasError: false } }
         ),
         email: new FormTextInput(
             document.getElementById("registerEmail"),
             document.getElementById("registerEmailErrorBox"),
-            value => { return { hasError: false } }
+            value => {
+				const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+				let result = {
+					hasError: false,
+					errorMessage: "Invalid email format. Please insert a valid email."
+				}
+				if (!value.toLowerCase().match(regex))
+					result.hasError = true;
+				return result;
+			 }
         ),
         password: new FormTextInput(
             document.getElementById("registerPassword"),
             document.getElementById("registerPasswordErrorBox"),
-            value => { return { hasError: false } }
+            _ => { return { hasError: false } }
         ),
         confirmPassword: new FormTextInput(
             document.getElementById("registerConfirmPassword"),
             document.getElementById("registerConfirmPasswordErrorBox"),
-            value => { return { hasError: false } }
+            value => { 
+				let result = {
+					hasError: false,
+					errorMessage: "The passwords do not match."
+				}
+				if (value != document.getElementById("registerPassword").value)
+					result.hasError = true;
+				return result;
+			 }
         ),
     }
 
     registerForm.addEventListener("submit", evt => {
         evt.preventDefault();
-        if (registerForm.checkValidity()) {
-            console.log("Making post call");
+        if (registerForm.checkValidity() && customCheckFormValidity(registerFields)) {
             let formData = new FormData(registerForm);
             registerFieldset.disabled = true;
             makeCall("POST", "register", formData, (req) => {
@@ -86,7 +102,7 @@
                             break;
                         case 400:
                             let errors = JSON.parse(req.responseText);
-                            createPopup("Registration failed", "error", 5000);
+                            createPopup("Registration failed.", "error", 5000);
                             for (const [errorField, errorMessage] of Object.entries(errors))
                                 registerFields[errorField].displayError(errorMessage);
                             break;
@@ -99,6 +115,15 @@
             }, false);
         } else {
             registerForm.reportValidity();
+            createPopup("Registration failed.", "error", 5000);
         }
     });
+    
+    function customCheckFormValidity(formTextInputs) {
+		let isValid = true;
+		for (const textInput in formTextInputs) {
+			if (!formTextInputs[textInput].isValid()) isValid = false;
+		}
+		return isValid;
+	}
 }
