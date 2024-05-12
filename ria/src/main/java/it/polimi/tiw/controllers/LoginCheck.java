@@ -27,70 +27,70 @@ public class LoginCheck extends HttpServlet {
 	private Connection connection;
 
 	/**
-	 * @see HttpServlet#HttpServlet()
+	 * Initializes the servlet by initializing the database connection.
+	 * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
 	 */
-	public LoginCheck() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
+	@Override
 	public void init() throws ServletException {
 		this.connection = DatabaseInitializer.initialize(this.getServletContext());
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * Handles the POST request by checking the user's credentials and setting the session attribute.
+	 * @param request the HttpServletRequest object that contains the request the client has made of the servlet
+	 * @param response the HttpServletResponse object that contains the response the servlet sends to the client
+	 * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
+	 * @throws IOException if an input or output exception occurs
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "GET method not allowed.");
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		response.setCharacterEncoding("UTF-8");
+
 		String username = request.getParameter("loginUsername");
 		String password = request.getParameter("loginPassword");
+
+		if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+			response.setContentType("text/plain");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().append("Missing parameters.");
+		    return;
+		}
 		
 		User user;
 		try {
 			user = new UserDAO(this.connection).login(username, password);
 		} catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database credential checking.");
+			response.setContentType("text/plain");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().append("Failure in database credential checking.");
 			return;
 		}
 		
 		if (user == null) {
-	        /* // Chose the redirect approach over forward approach to have more consistency with url 
-	         *    displayed in the top browser bar
-			request.setAttribute("errorMessage", "Wrong username or password"); // Error message
-	        request.getRequestDispatcher("/Auth").forward(request, response); // Forwarding back to the login page
-			*/
-			
+			// Login failed for wrong credentials
+			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
 			response.getWriter().append("Wrong username or password.");
 		    return;
 		}
 		
 		request.getSession().setAttribute("user", user);
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
 		response.getWriter().append(new Gson().toJson(user));
 	}
 	
+	/**
+	 * Closes the database connection when the servlet is destroyed.
+	 */
+	@Override
 	public void destroy() {
-		try {
-			if (connection != null) {
-				connection.close();
-			}
-		} catch (SQLException sqle) {
-		}
-	}
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 
 }

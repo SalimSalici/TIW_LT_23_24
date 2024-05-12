@@ -21,31 +21,34 @@ import it.polimi.tiw.daos.UserDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 
 /**
- * Servlet implementation class ActiveGroups
+ * This servlet is used to handle requests related to active groups.
+ * It fetches the active groups of the current user and returns them as a JSON array.
  */
 @WebServlet("/activegroups")
 @MultipartConfig
 public class ActiveGroups extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ActiveGroups() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+	/**
+	 * Initializes the servlet by initializing the database connection.
+	 * @throws UnavailableException if the database connection cannot be initialized.
+	 */
+	@Override
     public void init() throws UnavailableException {
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles GET requests. It fetches the active groups of the current user and returns them as a JSON array.
+	 * If the database connection fails, it returns a 502 error.
+	 * @param request the HTTP request.
+	 * @param response the HTTP response.
+	 * @throws ServletException if an error occurs while processing the request.
+	 * @throws IOException if an error occurs while writing the response.
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
 		User user = (User)request.getSession().getAttribute("user");
@@ -55,21 +58,25 @@ public class ActiveGroups extends HttpServlet {
 		try {
 			groups = uDAO.fetchGroupsWithUser(user.getId());
 		} catch (SQLException e) {
+			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getWriter().append("Database failure.");
 			return;
 		}
 		
+		response.setContentType("application/json");
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().append(new Gson().toJson(groups));
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Closes the database connection when the servlet is destroyed.
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 }

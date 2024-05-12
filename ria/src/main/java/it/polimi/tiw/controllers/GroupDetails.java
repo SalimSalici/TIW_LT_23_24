@@ -22,7 +22,7 @@ import it.polimi.tiw.daos.GroupDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 
 /**
- * Servlet implementation class GroupDetails
+ * Servlet implementation class GroupDetails to fetch the details of a group.
  */
 @WebServlet("/groupdetails")
 @MultipartConfig
@@ -30,30 +30,33 @@ public class GroupDetails extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
 	private Gson gson;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public GroupDetails() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+	/**
+	 * Initializes the servlet by initializing the Gson object and the database connection.
+	 * @throws UnavailableException if the database connection cannot be initialized.
+	 */
+	@Override
     public void init() throws UnavailableException {
     	this.gson = new Gson();
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles GET requests. It fetches the details of a group and its members and returns them as a JSON object.
+	 * @param request the HTTP request.
+	 * @param response the HTTP response.
+	 * @throws ServletException if an error occurs while processing the request.
+	 * @throws IOException if an error occurs while writing the response.
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
+		// Get the group id from the request
 		int groupId = Integer.parseInt(request.getParameter("id"));
 		GroupDAO gDAO = new GroupDAO(this.connection);
 		
+		// Fetch the group and its users
 		Group group;
 		List<User> users;
 		try {
@@ -61,28 +64,31 @@ public class GroupDetails extends HttpServlet {
 			users = gDAO.fetchUsersOfGroup(groupId);
 			group.setUserCount(users.size());
 		} catch (SQLException e) {
+			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().append(e.getMessage());
 			response.getWriter().append("Group not found.");
-			
-//			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
 		
+		// Create a JSON object with the group and its users
 		JsonObject json = new JsonObject();
 		json.add("group", this.gson.toJsonTree(group));
 		json.add("users", this.gson.toJsonTree(users));
 		
+		// Return the JSON object as the response
+		response.setContentType("application/json");
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().append(json.toString());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Closes the database connection when the servlet is destroyed.
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 }

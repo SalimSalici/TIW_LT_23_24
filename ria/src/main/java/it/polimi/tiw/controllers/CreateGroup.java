@@ -21,41 +21,37 @@ import it.polimi.tiw.daos.GroupDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 
 /**
- * Servlet implementation class RequestGroupCreation
+ * Servlet implementation class CreateGroup that handles requests for creating a new group.
  */
 @WebServlet("/creategroup")
 @MultipartConfig
 public class CreateGroup extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public CreateGroup() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+    /**
+     * Initializes the servlet by initializing the database connection.
+     * @throws UnavailableException if the database connection cannot be initialized.
+     */
+    @Override
     public void init() throws UnavailableException {
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles POST requests. It validates the input data, checks if the group name is available for the user,
+	 * and if everything is correct, it creates a new group.
+	 * If the database connection fails, it returns a 502 error.
+	 * @param request the HTTP request.
+	 * @param response the HTTP response.
+	 * @throws ServletException if an error occurs while processing the request.
+	 * @throws IOException if an error occurs while writing the response.
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
+		// Get the input parameters
 		String groupName = request.getParameter("groupName");
 		int duration;
 		int minMembers;
@@ -64,6 +60,7 @@ public class CreateGroup extends HttpServlet {
 		int inviteCount = usersToInviteStrings.length;
 		int[] usersToInvite = new int[inviteCount];
 		try {
+			// Validate the input parameters
 			if (groupName == null) throw new NullPointerException();
 			duration = Integer.parseInt(request.getParameter("duration"));
 			minMembers = Integer.parseInt(request.getParameter("minMembers"));
@@ -71,46 +68,67 @@ public class CreateGroup extends HttpServlet {
 			for (int i = 0; i < usersToInvite.length; i++)
 				usersToInvite[i] = Integer.parseInt(usersToInviteStrings[i]);
 		} catch (NumberFormatException | NullPointerException e) {
+			// If the input parameters are not valid, return a bad request response
+			response.setContentType("application/json");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			String jsonString = new Gson().toJson(List.of("Form was not sent correctly."));
 			response.getWriter().append(jsonString);
 			return;
 		}
 		
+		// Validate the input parameters
 		List<String> errors = this.validateInputs(groupName, duration, minMembers, maxMembers, inviteCount);
 		
+		// Check if the group name is available for the user
 		GroupDAO gDAO = new GroupDAO(this.connection);
 		User user = (User)request.getSession().getAttribute("user");
 		try {
 			if (!gDAO.isGroupNameAvailableForUser(user.getId(), groupName))
 				errors.add("You already have a group named '" + groupName + "'. Please choose another name.");
 		} catch (SQLException e) {
+			// If the database connection fails, return a bad gateway response
+			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getWriter().append("Database failure.");
 			return;
 		}
 		
-		
-		
+		// If there are any errors, return a bad request response
 		if (!errors.isEmpty()) {
+			response.setContentType("application/json");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().append(new Gson().toJson(errors));
 		    return;
 		}
 
-		// Validation passed
+		// Validation passed, create a new group
 		try {
 			gDAO.createNewGroup(groupName, user.getId(), duration, minMembers, maxMembers, usersToInvite);
 		} catch (SQLException e) {
+			// If the database connection fails, return a bad gateway response
+			response.setContentType("text/plain");
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getWriter().append("Database failure.");
 			return;
 		}
 		
+		// If everything is successful, return an OK response
+		response.setContentType("application/json");
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().append("Group created");
 	}
 	
+	/**
+	 * Validates the input data. It checks if the group name is within the correct length,
+	 * if the minimum and maximum members are at least 1, and if the maximum members are not less than the minimum members.
+	 * It also checks if the number of invited users is within the correct range.
+	 * @param groupName the name of the group.
+	 * @param duration the duration of the group.
+	 * @param minMembers the minimum number of members.
+	 * @param maxMembers the maximum number of members.
+	 * @param inviteCount the number of invited users.
+	 * @return a list of errors, if any.
+	 */
 	private List<String> validateInputs(String groupName, int duration, int minMembers, int maxMembers, int inviteCount) {
 		List<String> errors = new LinkedList<>();
 		
@@ -136,5 +154,16 @@ public class CreateGroup extends HttpServlet {
 		
 		return errors;
 	}
+
+	/**
+	 * Closes the database connection when the servlet is destroyed.
+	 */
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 
 }

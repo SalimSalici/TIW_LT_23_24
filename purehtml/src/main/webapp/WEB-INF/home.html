@@ -59,8 +59,9 @@
 		</form>
 
 		<br>
-		<h2 th:text="${#lists.isEmpty(ownedGroups)} ? 'You have not created any group yet' : 'Your active Groups:'">Your
-			active Groups:</h2>
+		<h2 th:text="${#lists.isEmpty(ownedGroups)} ? 'No active groups you created to show' : 'Active groups you created:'">
+			Active groups you created:
+		</h2>
 		<ul th:remove="all-but-first" class="group-list">
 			<li th:each="group : ${ownedGroups}" class="group-elem">
 				<h3 th:text="${group.groupName}">Group name</h3>
@@ -130,7 +131,7 @@
 		</ul>
 
 		<br>
-		<h2>Other active groups you are part of:</h2>
+		<h2 th:text="${#lists.isEmpty(otherGroups)} ? 'You are\'t part of any active group' : 'Active groups you are part of:'">Active groups you are part of:</h2>
 		<ul th:remove="all-but-first" class="group-list">
 			<li th:each="group : ${otherGroups}"  class="group-elem">
 				<h3 th:text="${group.groupName}">Group name</h3>

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebFilter({"/activegroups", "/groupdetails", "/creategroup", "/ownedactivegroups"})
+@WebFilter({"/activegroups", "/groupdetails", "/creategroup", "/ownedactivegroups", "/removegroupmember", "/users"})
 public class LoginChecker implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

@@ -52,7 +52,7 @@ public class UserDAO {
 	}
 
 	/**
-	 * Logs a user into the system.
+	 * Logs in a user into the system.
 	 * @param username The username of the user.
 	 * @param password The password of the user.
 	 * @return The user if the login is successful, or null if it is not.
@@ -68,12 +68,13 @@ public class UserDAO {
 					return null;
 				else {
 					result.next();
-					User user = new User();
-					user.setId(result.getInt("id"));
-					user.setUsername(result.getString("username"));
-					user.setEmail(result.getString("email"));
-					user.setName(result.getString("name"));
-					user.setSurname(result.getString("surname"));
+					User user = new User(
+						result.getInt("id"),
+						result.getString("username"),
+						result.getString("email"),
+						result.getString("name"),
+						result.getString("surname")
+					);
 					return user;
 				}
 			}

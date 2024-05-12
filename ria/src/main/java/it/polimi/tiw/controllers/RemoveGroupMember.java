@@ -18,36 +18,31 @@ import it.polimi.tiw.daos.GroupDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 
 /**
- * Servlet implementation class RemoveGroupMember
+ * Servlet implementation class RemoveGroupMember that handles the removal of a member from a group.
  */
 @WebServlet("/removegroupmember")
 @MultipartConfig
 public class RemoveGroupMember extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public RemoveGroupMember() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+	/**
+	 * Initializes the servlet by initializing the database connection.
+	 * @throws UnavailableException if the servlet is unable to handle the request
+	 */
+	@Override
     public void init() throws UnavailableException {
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles the POST request by removing a member from a group.
+	 * @param request the HttpServletRequest object that contains the request the client has made of the servlet
+	 * @param response the HttpServletResponse object that contains the response the servlet sends to the client
+	 * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
+	 * @throws IOException if an input or output exception occurs
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -106,4 +101,14 @@ public class RemoveGroupMember extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Closes the database connection when the servlet is destroyed.
+	 */
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 }

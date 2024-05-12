@@ -21,31 +21,32 @@ import it.polimi.tiw.daos.UserDAO;
 import it.polimi.tiw.utils.DatabaseInitializer;
 
 /**
- * Servlet implementation class OwnedGroups
+ * Servlet implementation class OwnedGroups that fetches the active groups owned by the user
  */
 @WebServlet("/ownedactivegroups")
 @MultipartConfig
 public class OwnedActiveGroups extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public OwnedActiveGroups() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
     
+	/**
+	 * Initializes the servlet by initializing the database connection.
+	 * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
+	 */
+	@Override
     public void init() throws UnavailableException {
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Handles the GET request by fetching the active groups owned by the user.
+	 * @param request the HttpServletRequest object that contains the request the client has made of the servlet
+	 * @param response the HttpServletResponse object that contains the response the servlet sends to the client
+	 * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
+	 * @throws IOException if an input or output exception occurs
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
 		User user = (User)request.getSession().getAttribute("user");
@@ -55,20 +56,25 @@ public class OwnedActiveGroups extends HttpServlet {
 		try {
 			ownedGroups = uDAO.fetchGroupsOwnedBy(user.getId());
 		} catch (SQLException e) {
+			response.setContentType("text/plain");
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
 		
+		response.setContentType("application/json");
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.getWriter().append(new Gson().toJson(ownedGroups));
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Closes the database connection when the servlet is destroyed.
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
+	@Override
+	public void destroy() {
+        try {
+            if(this.connection != null )
+                this.connection.close();
+        } catch (SQLException e) {}
+    }
 
 }
