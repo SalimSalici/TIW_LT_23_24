@@ -1,37 +1,44 @@
 {
 
-	// TODO: Disable inputs when waiting for server response
-
+	// Check if user is not logged in and call logout function
 	if (sessionStorage.getItem("user") == null)
 		logout();
 
+	// Retrieve logged in user's data from session storage
+	const loggedUser = JSON.parse(sessionStorage.getItem("user"));
+
+	// Page components
+	const ownedGroupsManager = new GroupsManager("ownedactivegroups", document.getElementById("ownedActiveGroupsContainer"));
+	const otherGroupsManager = new GroupsManager("activegroups", document.getElementById("otherActiveGroupsContainer"));
+	const createGroupManager = new CreateGroupManager();
+
+	window.addEventListener("load", () => {
+		// Add event listener for logout link
+		document.querySelector("a[href='logout']").addEventListener('click', () => {
+			sessionStorage.removeItem("user");
+		});
+
+		document.getElementById("welcomeNameText").innerText = loggedUser.username;
+		createGroupManager.registerEvents();
+		ownedGroupsManager.fetchAndDisplayGroups();
+		otherGroupsManager.fetchAndDisplayGroups();
+	});
+
+	// Define logout function
 	function logout() {
-		makeCall("POST", 'logout', null, function (risposta) {
-			if (risposta.readyState == 4) {
+		makeCall("POST", 'logout', null, (req) => {
+			if (req.readyState == 4) {
 				sessionStorage.removeItem("user");
 				window.location.href = "auth.html";
 			}
 		});
 	}
 
-	document.querySelector("a[href='logout']").addEventListener('click', () => {
-		sessionStorage.removeItem("user");
-	});
-
-	const loggedUser = JSON.parse(sessionStorage.getItem("user"));
-	document.getElementById("welcomeNameText").innerText = loggedUser.username;
-
-	let ownedGroupsManager = new GroupsManager("ownedactivegroups", document.getElementById("ownedActiveGroupsContainer"));
-	ownedGroupsManager.fetchAndDisplayGroups();
-
-	let otherGroupsManager = new GroupsManager("activegroups", document.getElementById("otherActiveGroupsContainer"));
-	otherGroupsManager.fetchAndDisplayGroups();
-
-	let createGroupManager = new CreateGroupManager();
-
+	// Define CreateGroupManager constructor function
 	function CreateGroupManager() {
 		let self = this;
 
+		// Assign DOM elements to properties
 		this.form = document.getElementById("createGroupForm");
 		this.createGroupFieldset = document.getElementById("createGroupFieldset");
 		this.errorBoxContainer = this.form.querySelector(".error-box");
@@ -45,126 +52,132 @@
 		this.modalContainer = document.getElementById("modalContainer");
 		this.attemptText = document.getElementById("attemptText");
 		this.inviteMemberListContainer = document.getElementById("inviteMemberListContainer");
-
 		this.userCheckboxTemplate = document.getElementById("userCheckboxTemplate");
 
 		this.attempt = 1;
 
 		this.users = [];
 
-		this.goToUserSelectionBtn.addEventListener("click", evt => {
-			evt.preventDefault();
-			evt.stopImmediatePropagation();
-			evt.stopPropagation();
+		this.registerEvents = function () {
+			// Add event listener for moving to user selection
+			this.goToUserSelectionBtn.addEventListener("click", evt => {
+				evt.preventDefault();
+				evt.stopImmediatePropagation();
+				evt.stopPropagation();
 
-			self.hideErrors();
+				self.hideErrors();
 
-			if (self.form.checkValidity()) {
-				if (parseInt(self.minMembersInput.value) > parseInt(self.maxMembersInput.value)) {
-					createPopup("Minimum members must be less than or equal to the maximum members", "error", 5000);
-					return;
-				}
+				// Validate form and check member constraints
+				if (self.form.checkValidity()) {
+					if (parseInt(self.minMembersInput.value) > parseInt(self.maxMembersInput.value)) {
+						createPopup("Minimum members must be less than or equal to the maximum members", "error", 5000);
+						return;
+					}
 
-				self.createGroupFieldset.setAttribute("disabled", "true");
-				makeCall("GET", "users", null, (req) => {
-					if (req.readyState === 4) {
-						switch (req.status) {
-							case 200:
-								self.users = JSON.parse(req.responseText);
-								self.displayUserSelection();
-								break;
-							case 403:
-								window.location.href = req.getResponseHeader("Location");
-								window.sessionStorage.removeItem("user");
-								break;
-							default:
-								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
-									req.responseText : "Error fetching all users.";
-								createPopup(errorMsg, "error", 5000);
+					self.createGroupFieldset.setAttribute("disabled", "true");
+					makeCall("GET", "users", null, (req) => {
+						if (req.readyState === 4) {
+							switch (req.status) {
+								case 200:
+									self.users = JSON.parse(req.responseText);
+									self.displayUserSelection();
+									break;
+								case 403:
+									window.location.href = req.getResponseHeader("Location");
+									window.sessionStorage.removeItem("user");
+									break;
+								default:
+									let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
+										req.responseText : "Error fetching all users.";
+									createPopup(errorMsg, "error", 5000);
+							}
+							self.createGroupFieldset.removeAttribute("disabled");
 						}
-						self.createGroupFieldset.removeAttribute("disabled");
-					}
-				});
+					});
 
-			} else {
-				self.form.reportValidity();
-				createPopup("Please fill in all fields correctly", "error", 5000);
-			}
-		});
-
-		this.form.addEventListener("submit", evt => {
-			evt.preventDefault();
-			evt.stopImmediatePropagation();
-			evt.stopPropagation();
-
-			if (self.form.checkValidity()) {
-				let formData = new FormData(self.form);
-				let usersCount = formData.getAll("usersToInvite[]").length;
-
-				let errorMessage = null;
-				let shortage = self.minMembersInput.value - usersCount;
-				let excess = usersCount - self.maxMembersInput.value;
-				if (shortage > 0) {
-					errorMessage = "Not enough users selected. Select at least " + shortage + " more.";
-				} else if (excess > 0) {
-					errorMessage = "Too many users selected. Deselect at least " + excess + " user(s).";
+				} else {
+					self.form.reportValidity();
+					createPopup("Please fill in all fields correctly", "error", 5000);
 				}
+			});
 
-				if (errorMessage != null) {
-					self.attempt++;
-					self.attemptText.innerText = self.attempt;
+			// Add event listener for submitting the group creation form
+			this.form.addEventListener("submit", evt => {
+				evt.preventDefault();
+				evt.stopImmediatePropagation();
+				evt.stopPropagation();
 
-					if (self.attempt <= 3) {
-						createPopup(errorMessage, "error", 5000);
-					} else {
-						self.form.reset();
-						self.closeModal();
-						createPopup("Group creation cancelled because you exceeded 3 attempts. Please start over.", "error", 5000);
+				if (self.form.checkValidity()) {
+					let formData = new FormData(self.form);
+					let usersCount = formData.getAll("usersToInvite[]").length;
+
+					let errorMessage = null;
+					let shortage = self.minMembersInput.value - usersCount;
+					let excess = usersCount - self.maxMembersInput.value;
+					if (shortage > 0) {
+						errorMessage = "Not enough users selected. Select at least " + shortage + " more.";
+					} else if (excess > 0) {
+						errorMessage = "Too many users selected. Deselect at least " + excess + " user(s).";
 					}
 
-					return;
-				}
+					if (errorMessage != null) {
+						self.attempt++;
+						self.attemptText.innerText = self.attempt;
 
-				self.createGroupFieldset.setAttribute("disabled", "true");
-				makeCall("POST", "creategroup", formData, req => {
-					if (req.readyState == 4) {
-						switch (req.status) {
-							case 200:
-								ownedGroupsManager.fetchAndDisplayGroups();
-								otherGroupsManager.fetchAndDisplayGroups();
-								self.form.reset();
-								self.closeModal();
-								createPopup("Group created successfully.", "success", 5000);
-								break;
-							case 400:
-								self.displayErrors(JSON.parse(req.responseText));
-								self.closeModal();
-								break;
-							case 403:
-								window.location.href = req.getResponseHeader("Location");
-								window.sessionStorage.removeItem("user");
-								break;
-							default:
-								let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
-									req.responseText : "Error creating group.";
-								createPopup(errorMsg, "error", 5000);
+						if (self.attempt <= 3) {
+							createPopup(errorMessage, "error", 5000);
+						} else {
+							self.form.reset();
+							self.closeModal();
+							createPopup("Group creation cancelled because you exceeded 3 attempts. Please start over.", "error", 5000);
 						}
-						self.createGroupFieldset.removeAttribute("disabled");
+
+						return;
 					}
-				})
 
-			} else {
-				self.form.reportValidity();
-				self.closeModal();
-				createPopup("Please fill in all fields correctly", "error", 5000);
-			}
-		})
+					self.createGroupFieldset.setAttribute("disabled", "true");
+					makeCall("POST", "creategroup", formData, req => {
+						if (req.readyState == 4) {
+							switch (req.status) {
+								case 200:
+									ownedGroupsManager.fetchAndDisplayGroups();
+									otherGroupsManager.fetchAndDisplayGroups();
+									self.form.reset();
+									self.closeModal();
+									createPopup("Group created successfully.", "success", 5000);
+									break;
+								case 400:
+									self.displayErrors(JSON.parse(req.responseText));
+									self.closeModal();
+									break;
+								case 403:
+									window.location.href = req.getResponseHeader("Location");
+									window.sessionStorage.removeItem("user");
+									break;
+								default:
+									let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
+										req.responseText : "Error creating group.";
+									createPopup(errorMsg, "error", 5000);
+							}
+							self.createGroupFieldset.removeAttribute("disabled");
+						}
+					})
 
+				} else {
+					self.form.reportValidity();
+					self.closeModal();
+					createPopup("Please fill in all fields correctly", "error", 5000);
+				}
+			});
+		}
+
+		// Add event listener for cancelling group creation
 		this.cancelGroupCreationBtn.addEventListener("click", evt => {
 			self.form.reset();
 			self.closeModal();
 		});
 
+		// Function to display user selection for group creation
 		this.displayUserSelection = function () {
 			self.attemptText.innerText = self.attempt = 1;
 			self.inviteMemberListContainer.innerHTML = "";
@@ -189,6 +202,7 @@
 			self.openModal();
 		}
 
+		// Function to display errors during group creation
 		this.displayErrors = function (errors) {
 			self.createGroupErrorList.innerHTML = "";
 			for (let i = 0; i < errors.length; i++) {
@@ -200,10 +214,12 @@
 			self.errorBoxContainer.style.display = "block";
 		}
 
+		// Function to hide error messages
 		this.hideErrors = function () {
 			self.errorBoxContainer.style.display = "none";
 		}
 
+		// Function to open modal for group creation
 		this.openModal = function () {
 			this.modalContainer.style.display = "block";
 			setTimeout(() => {
@@ -211,6 +227,7 @@
 			}, 50);
 		}
 
+		// Function to close modal for group creation
 		this.closeModal = function () {
 			this.modalContainer.classList.add("modal-hidden");
 			setTimeout(() => {
@@ -219,6 +236,7 @@
 		}
 	}
 
+	// Define GroupsManager constructor function
 	function GroupsManager(_url, _containerEl) {
 		let self = this;
 
@@ -228,6 +246,7 @@
 
 		this.groupContainerTemplate = document.getElementById("groupContainerTemplate");
 
+		// Function to fetch and display groups
 		this.fetchAndDisplayGroups = function () {
 			makeCall("GET", this.url, null, (req) => {
 				if (req.readyState == 4) {
@@ -247,6 +266,7 @@
 			});
 		}
 
+		// Function to display groups in the container
 		this.displayGroups = function () {
 			this.containerEl.innerHTML = "";
 			for (let i = 0; i < this.groups.length; i++) {
@@ -280,17 +300,22 @@
 			}
 		}
 
+		// Function to remove a member from a group
 		this.removeMemberFromGroup = function (groupId, memberId) {
 			for (let i = 0; i < this.groups.length; i++) {
 				if (this.groups[i].id == groupId) {
 					let group = this.groups[i];
-					group.groupDetails.removeUser(memberId);
+					if (memberId == loggedUser.id && self == otherGroupsManager)
+						group["containerEl"].parentElement.removeChild(group["containerEl"]);
+					else
+						group.groupDetails.removeUser(memberId);
 					return;
 				}
 			}
 		}
 	}
 
+	// Define GroupDetails constructor function
 	function GroupDetails(_group, _groupEl, _groupDetailsContainer, _toggleBtnEl) {
 
 		let self = this;
@@ -323,6 +348,7 @@
 
 		this.users = [];
 
+		// Add event listener to toggle group details
 		this.toggleBtnEl.addEventListener("click", evt => {
 			if (self.groupEl.classList.contains("group-expanded")) { // close group details
 				self.groupEl.classList.remove("group-expanded");
@@ -334,6 +360,7 @@
 			}
 		});
 
+		// Function to fetch and expand group details
 		this.fetchAndExpand = function () {
 			let url = "groupdetails?id=" + this.group.id
 			makeCall("GET", url, null, req => {
@@ -357,6 +384,7 @@
 			});
 		}
 
+		// Function to expand group details in the UI
 		this.expand = function (group) {
 
 			// Group info
@@ -411,6 +439,7 @@
 			this.toggleBtnEl.disabled = false;
 		}
 
+		// Setup trash functionality for removing users
 		this.setupTrash = function () {
 			this.usersTrashContainer.classList.remove("no-trash");
 
@@ -465,6 +494,7 @@
 			});
 		}
 
+		// Function to remove a user from the group
 		this.removeUser = function (userId) {
 			self.group.userCount--;
 			self.groupInfoMemeberCount.innerText = self.group.userCount;
@@ -480,6 +510,7 @@
 			}
 		}
 
+		// Setup trash functionality if the logged user is the group owner
 		if (this.group.userId == loggedUser.id) {
 			this.setupTrash();
 		}

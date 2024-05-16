@@ -52,7 +52,7 @@ public class LoginCheck extends HttpServlet {
 
 		if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
 			response.setContentType("text/plain");
-			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().append("Missing parameters.");
 		    return;
 		}

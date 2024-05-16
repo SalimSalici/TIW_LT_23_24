@@ -69,6 +69,10 @@ public class GroupDetails extends HttpServlet {
 			users = gDAO.fetchUsersOfGroup(groupId);
 			// Set the user count for the group
 			group.setUserCount(users.size());
+		} catch (NullPointerException e) {
+			// Handle the case in which a group with the given id doesn't exist
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Group not found.");
+			return;
 		} catch (SQLException e) {
 			// Handle SQL exceptions by sending a server error response
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
