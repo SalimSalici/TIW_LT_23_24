@@ -3,6 +3,7 @@
     let loginForm = document.getElementById("loginForm");
     let loginErrorBox = document.getElementById("loginErrorBox");
     let loginFieldset = document.getElementById("loginSubmitBtn").closest("fieldset");
+    let rememberMeEl = document.getElementById("rememberMe");
     loginForm.addEventListener("submit", evt => {
         evt.preventDefault();
         if (loginForm.checkValidity()) {
@@ -14,6 +15,10 @@
                         case 200:
                             let userJsonString = response.responseText;
                             sessionStorage.setItem("user", userJsonString);
+                            if (rememberMeEl.checked === true)
+								localStorage.setItem("rememberMe", formData.get("loginUsername"));
+							else
+								localStorage.removeItem("rememberMe");
                             window.location.href = "home.html";
                             break;
                         case 401:
@@ -32,6 +37,14 @@
             loginForm.reportValidity();
         }
     });
+    
+    window.addEventListener("load", _ => {
+		const username = localStorage.getItem("rememberMe");
+		if (username) {
+			document.getElementById("loginUsername").value = username;
+			rememberMeEl.checked = true;
+		}
+	})
 
     // REGISTER FORM -------------
     let registerForm = document.getElementById("registerForm");

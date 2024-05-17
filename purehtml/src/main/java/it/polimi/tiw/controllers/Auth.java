@@ -1,6 +1,7 @@
 package it.polimi.tiw.controllers;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +54,11 @@ public class Auth extends HttpServlet {
 		String path = "auth";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		for (Cookie cookie : request.getCookies()) {
+			if (cookie.getName().equals("rememberMe"))
+				ctx.setVariable("rememberMe", cookie.getValue());
+		}
+		
 		templateEngine.process(path, ctx, response.getWriter());
 	}
 
@@ -118,6 +125,15 @@ public class Auth extends HttpServlet {
 		    this.doGet(request, response);
 		    return;
 		}
+		
+		// Set cookie for "Remember username" feature
+		Cookie rememberMeCookie = new Cookie("rememberMe", URLEncoder.encode(username, "UTF-8"));
+		if (request.getParameter("rememberMe") != null) {
+		    rememberMeCookie.setMaxAge(60 * 60 * 24 * 30);
+		} else {
+			rememberMeCookie.setMaxAge(0);
+		}
+		response.addCookie(rememberMeCookie);
 		
 		// Set user session and redirect to home page
 		request.getSession().setAttribute("user", user);

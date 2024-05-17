@@ -21,13 +21,14 @@
 				<div th:if="${loginErrorMessage != null}" class="error-box"
 					th:text="${loginErrorMessage}">Error message</div>
 				<label for="loginUsername">Username:</label><br>
-				<input type="text" id="loginUsername" name="loginUsername" class="textInput" required><br>
+				<input type="text" id="loginUsername" name="loginUsername"
+					th:value="${rememberMe != null ? rememberMe : ''}" class="textInput" required><br>
 				<label for="loginPassword">Password:</label><br>
 				<input type="password" id="loginPassword" name="loginPassword" class="textInput" required><br>
 				<div class="toggle-wrapper">
-					<input type="checkbox" class="toggle-input">
+					<input type="checkbox" name="rememberMe" class="toggle-input" th:checked="${rememberMe != null}">
 					<span style="position: relative; top: -4px; left: 5px; color: #404040">
-						Remember me
+						Remember username
 					</span>
 				</div>
 				<input type="hidden" name="authAction" value="login">

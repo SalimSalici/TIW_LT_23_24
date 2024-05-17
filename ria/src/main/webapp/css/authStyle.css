@@ -60,6 +60,10 @@ input[type="submit"]:disabled {
 	cursor: wait !important;
 }
 
+#rememberMe:disabled {
+	background-color: #8c9d9c !important;
+}
+
 .toggle-wrapper {
 	margin-top: -6px;
 }
