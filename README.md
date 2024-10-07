@@ -6,6 +6,8 @@ This application was developed for the exam of the _Tecnologie Informatiche per 
 
 **Final Grade:** 30/30 cum laude
 
+![Web app preview](https://github.com/SalimSalici/TIW_LT_23_24/blob/master/preview.gif)
+
 ### Overview
 This web application allows users to manage work groups. It supports user registration, login, and group management functionalities, including:
 
@@ -19,6 +21,10 @@ As per project requiremente, two versions of the same application have been deve
 **Pure HTML version:** A traditional multi-page application with full page reloads.
 
 **JavaScript/RIA version:** A rich client-server single-page application (SPA) with asynchronous updates.
+
+_Full specification_ (in Italian) can be found [here](https://github.com/SalimSalici/TIW_LT_23_24/blob/master/specifications_tiw.pdf).
+
+_Project documentation_ can be found [here](https://github.com/SalimSalici/TIW_LT_23_24/blob/master/project_documentation.pdf).
 
 ### Tools
 
