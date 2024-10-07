@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
- * Servlet Filter implementation class AuthValidationCleanupFilter to clean up the createGroupValidation attribute
+ * Servlet Filter implementation class ValidationCleanupFilter to clean up the createGroupValidation attribute
  * from the session after the it has been used by the Home servlet
  */
 @WebFilter({"/home"})
@@ -22,6 +22,7 @@ public class ValidationCleanupFilter extends HttpFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		
 		chain.doFilter(request, response);
 
 		// After processing the request

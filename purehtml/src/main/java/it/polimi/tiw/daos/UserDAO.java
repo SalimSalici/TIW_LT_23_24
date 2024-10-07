@@ -1,5 +1,8 @@
 package it.polimi.tiw.daos;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -59,23 +62,30 @@ public class UserDAO {
 	 * @throws SQLException if a database error occurs.
 	 */
 	public User login(String username, String password) throws SQLException {
-		String query = "SELECT  id, username, email, name, surname FROM users WHERE username = ? AND password = ?";
+		String query = "SELECT  id, username, password_hash, salt, email, name, surname FROM users WHERE username = ?";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, username);
-			pstatement.setString(2, password);
 			try (ResultSet result = pstatement.executeQuery();) {
 				if (!result.isBeforeFirst()) // no results, credential check failed
 					return null;
 				else {
 					result.next();
-					User user = new User(
-						result.getInt("id"),
-						result.getString("username"),
-						result.getString("email"),
-						result.getString("name"),
-						result.getString("surname")
-					);
-					return user;
+					byte[] password_hash = result.getBytes("password_hash");
+					byte[] salt = result.getBytes("salt");
+					try {
+						if (this.verifyPassword(password, password_hash, salt))
+							return new User(
+								result.getInt("id"),
+								result.getString("username"),
+								result.getString("email"),
+								result.getString("name"),
+								result.getString("surname")
+							); 
+						else return null;
+					} catch (NoSuchAlgorithmException e) {
+						throw new SQLException();
+					}
+					
 				}
 			}
 		}
@@ -111,13 +121,22 @@ public class UserDAO {
 	 * @throws SQLException if a database error occurs.
 	 */
 	public void register(String username, String email, String password, String name, String surname) throws SQLException {
-		String query = "INSERT INTO users(username, email, password, name, surname) VALUES (?, ?, ?, ?, ?)";
+		byte[] salt = this.generateSalt();
+		byte[] passwordHash;
+	    try {
+			passwordHash = this.hashPassword(password, salt);
+		} catch (NoSuchAlgorithmException e) {
+			throw new SQLException();
+		}
+	    
+		String query = "INSERT INTO users(username, email, password_hash, salt, name, surname) VALUES (?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement pstatement = connection.prepareStatement(query);) {
 			pstatement.setString(1, username);
 			pstatement.setString(2, email);
-			pstatement.setString(3, password);
-			pstatement.setString(4, name);
-			pstatement.setString(5, surname);
+			pstatement.setBytes(3, passwordHash);
+			pstatement.setBytes(4, salt);
+			pstatement.setString(5, name);
+			pstatement.setString(6, surname);
 			pstatement.executeUpdate();
 		}
 	}
@@ -197,5 +216,24 @@ public class UserDAO {
 			}
 		}
 		return groups;
-	}	
+	}
+	
+	private byte[] hashPassword(String password, byte[] salt) throws NoSuchAlgorithmException {
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	    md.update(salt);
+	    byte[] hashedPassword = md.digest(password.getBytes());
+	    return hashedPassword;
+	}
+	
+	public byte[] generateSalt() {
+	    SecureRandom random = new SecureRandom();
+	    byte[] salt = new byte[16];
+	    random.nextBytes(salt);
+	    return salt;
+	}
+	
+	public boolean verifyPassword(String inputPassword, byte[] storedHash, byte[] storedSalt) throws NoSuchAlgorithmException {
+	    byte[] hashedInput = this.hashPassword(inputPassword, storedSalt);
+	    return java.util.Arrays.equals(hashedInput, storedHash);
+	}
 }

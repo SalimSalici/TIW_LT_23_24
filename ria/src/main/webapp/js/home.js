@@ -26,7 +26,7 @@
 
 	// Define logout function
 	function logout() {
-		makeCall("POST", 'logout', null, (req) => {
+		makeCall("GET", 'logout', null, (req) => {
 			if (req.readyState == 4) {
 				sessionStorage.removeItem("user");
 				window.location.href = "auth.html";
@@ -83,11 +83,11 @@
 									self.displayUserSelection();
 									break;
 								case 403:
-									window.location.href = req.getResponseHeader("Location");
 									window.sessionStorage.removeItem("user");
+									window.location.href = req.getResponseHeader("Location");
 									break;
 								default:
-									let errorMsg = req.getResponseHeader('content-type').includes("application/json") ?
+									let errorMsg = req.getResponseHeader('content-type').includes("text/plain") ?
 										req.responseText : "Error fetching all users.";
 									createPopup(errorMsg, "error", 5000);
 							}

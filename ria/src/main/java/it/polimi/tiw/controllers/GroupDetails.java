@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import it.polimi.tiw.beans.Group;
@@ -37,7 +38,7 @@ public class GroupDetails extends HttpServlet {
 	 */
 	@Override
     public void init() throws UnavailableException {
-    	this.gson = new Gson();
+    	this.gson = new GsonBuilder().setDateFormat("dd MMM yyyy").create();
     	this.connection = DatabaseInitializer.initialize(this.getServletContext());
     }
 

@@ -43,11 +43,11 @@
 				</div>
 				<div class="group-info-item">
 					<h3>Creation date</h3>
-					<p th:text="${group.createdAt}">23/02/2024</p>
+					<p th:text="${#dates.format(group.createdAt, 'dd MMM yyyy')}">23/02/2024</p>
 				</div>
 				<div class="group-info-item">
 					<h3>End date</h3>
-					<p th:text="${group.endDate}">23/02/2024</p>
+					<p th:text="${#dates.format(group.endDate, 'dd MMM yyyy')}">23/02/2024</p>
 				</div>
 				<div class="group-info-break"></div>
 				<div class="group-info-item">

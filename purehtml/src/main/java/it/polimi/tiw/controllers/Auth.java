@@ -155,7 +155,7 @@ public class Auth extends HttpServlet {
 		String email = request.getParameter("registerEmail");
 		String password = request.getParameter("registerPassword");
 		String confirmPassword = request.getParameter("registerConfirmPassword");
-
+		
 		// Check if any registration parameters are missing
 		if (username == null || name == null || surname == null || email == null || password == null || confirmPassword == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing registration parameters.");
@@ -187,6 +187,7 @@ public class Auth extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure.");
 			return;
 		}
+		
 
 		User user;
 		try {
