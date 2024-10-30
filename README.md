@@ -4,7 +4,7 @@ This application was developed for the exam of the _Tecnologie Informatiche per 
 
 **Professor:** Fraternali Piero
 
-**Final Grade:** 30/30 cum laude
+**Final Grade:** 30/30 with honors
 
 ![Web app preview](https://github.com/SalimSalici/TIW_LT_23_24/blob/master/preview.gif)
 
